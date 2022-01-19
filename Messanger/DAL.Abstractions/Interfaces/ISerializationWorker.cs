@@ -8,6 +8,7 @@ namespace DAL.Abstractions.Interfaces
 {
     public interface ISerializationWorker
     {
-        Task Serialization(User user);
+        Task Serialize<TEntity>(TEntity obj, string jsonFileName);
+        Task<TEntity> Deserialize<TEntity>(string fileName);
     }
 }

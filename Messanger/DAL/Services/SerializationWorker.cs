@@ -12,20 +12,32 @@ namespace DAL.Services
 {
     public class SerializationWorker : ISerializationWorker
     {
-        public async Task Serialization(User user)
+        // public async Task Serialization(User user)
+        // {
+        //     string path = Path.GetFullPath(@"..\..\..\..\DAL\JSON files\Users.json");
+        //     Console.WriteLine(path);
+        //     var file = File.ReadAllTextAsync(path);
+        //     var x = JsonSerializer.Deserialize<List<User>>(file.Result);
+        //     x.Add(user);
+        //     using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
+        //     {
+        //         await JsonSerializer.SerializeAsync(fs, x);
+        //         Console.WriteLine("Data has been saved");
+        //     }
+        // }
+        
+        public async Task Serialize<TEntity>(TEntity obj, string jsonFileName)
         {
-            string path = Path.GetFullPath(@"..\..\..\..\DAL\JSON files\Users.json");
-            Console.WriteLine(path);
-            var file = File.ReadAllTextAsync(path);
-            var x = JsonSerializer.Deserialize<List<User>>(file.Result);
-            x.Add(user);
-            using (FileStream fs = new FileStream(path, FileMode.OpenOrCreate))
-            {
-                await JsonSerializer.SerializeAsync(fs, x);
-                Console.WriteLine("Data has been saved");
-            }
+            var json = JsonConvert.SerializeObject(obj);
+            await File.WriteAllTextAsync(jsonFileName,json);
         }
         
+        public async Task<TEntity> Deserialize<TEntity>(string fileName)
+        {
+            var json = await File.ReadAllTextAsync(fileName);
+            return JsonConvert.DeserializeObject<TEntity>(json);
+        }
+
         // var list = JsonConvert.DeserializeObject<List<Person>>(myJsonString);
         // list.Add(new Person(1234,"carl2");
         // var convertedJson = JsonConvert.SerializeObject(list, Formatting.Indented);

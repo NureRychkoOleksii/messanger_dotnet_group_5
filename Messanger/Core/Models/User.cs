@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using Core.Models;
 
 namespace Core
 {
-    public class User
+    public class User : IdKey
     {
         public string Nickname { get; set; }
         

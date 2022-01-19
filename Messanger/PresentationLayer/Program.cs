@@ -1,6 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using Core;
 using DAL.Abstractions.Interfaces;
 using DAL.Services;
@@ -14,13 +13,14 @@ namespace Messanger
         {
             User user = new User {Nickname = "Moonler", Password = "1234"};
             User user2 = new User {Nickname = "Xami", Password = "12345"};
+
+            var lst = new List<User>() {user, user2};
             SerializationWorker serializationWorker = new SerializationWorker();
-            serializationWorker.Serialization(user2);
-            serializationWorker.Serialization(user);
+            serializationWorker.Serialization<List<User>>(lst);
             Console.WriteLine(user.Nickname);
             DeserializationWorker deserializationWorker = new DeserializationWorker();
-            // var user5 = deserializationWorker.Deserialize();
-            // Console.WriteLine(user5.Result.Nickname);
+            var user5 = deserializationWorker.Deserialize<List<User>>(@"..\..\..\..\DAL\JSON files\Users.json");
+            user5.Result.ForEach(x => Console.WriteLine(x.Nickname));
         }
 
         private static void ConfigureServices(IServiceCollection services)
