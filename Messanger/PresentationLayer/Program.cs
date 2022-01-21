@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.IO;
 using Core;
-using DAL.Abstractions.Interfaces;
-using DAL.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Messanger
@@ -11,21 +9,25 @@ namespace Messanger
     {
         static void Main(string[] args)
         {
-            User user = new User {Nickname = "Moonler", Password = "1234"};
-            User user2 = new User {Nickname = "Xami", Password = "12345"};
-
-            var lst = new List<User>() {user, user2};
-            SerializationWorker serializationWorker = new SerializationWorker();
-            serializationWorker.Serialization<List<User>>(lst);
-            Console.WriteLine(user.Nickname);
-            DeserializationWorker deserializationWorker = new DeserializationWorker();
-            var user5 = deserializationWorker.Deserialize<List<User>>(@"..\..\..\..\DAL\JSON files\Users.json");
-            user5.Result.ForEach(x => Console.WriteLine(x.Nickname));
+            var services = new ServiceCollection();
+            ConfigureServices(services);
+            var serviceProvider = services.BuildServiceProvider();
+            serviceProvider.GetService<App>().StartApp();
         }
 
         private static void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<IDeserializationWorker, DeserializationWorker>();
+            // E:\dotnet messanger\Messanger\PresentationLayer
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false)
+                .AddEnvironmentVariables()
+                .Build();
+            services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
+
+            services.AddScoped<App>();
+            
+            BLL.DependencyRegistrar.ConfigureServices(services);
         }
     }
 }

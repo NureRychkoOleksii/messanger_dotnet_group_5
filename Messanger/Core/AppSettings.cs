@@ -2,6 +2,10 @@
 {
     public class AppSettings
     {
-        public string Directory { get; set; }
+        public string UsersDirectory { get; set; }
+        
+        public string RoomsDirectory { get; set; }
+        
+        public string RoomUsersDirectory { get; set; }
     }
 }

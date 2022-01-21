@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core;
 using Core.Models;
 using DAL.Abstractions.Interfaces;
+using Microsoft.Extensions.Options;
 
 namespace DAL.Services
 {
@@ -13,36 +16,63 @@ namespace DAL.Services
         private readonly AppSettings _appSettings;
         private List<T> data;
 
-        public Repository(ISerializationWorker serializationWorker, AppSettings appSettings)
+        public Repository(ISerializationWorker serializationWorker, IOptions<AppSettings> appSettings)
         {
             _serializationWorker = serializationWorker;
-            _appSettings = appSettings;
+            _appSettings = appSettings?.Value ?? throw new ArgumentNullException(nameof(appSettings));
+            data = new List<T>();
         }
 
-        public async Task<List<T>> GetAll()
+        public async Task<IEnumerable<T>> GetAllAsync(Type type)
         {
-            return await _serializationWorker.Deserialize<List<T>>(_appSettings.Directory);
+            var str = this.GetName(type);
+            return await _serializationWorker.Deserialize<IEnumerable<T>>(str);
         }
 
-        public async Task CreateObject(T obj)
+        public async Task CreateObjectAsync(T obj)
         {
-            data = await GetAll();
+            var str = this.GetName(typeof(T));
+            data = (await GetAllAsync(typeof(T))).ToList();
             data.Add(obj);
-            await _serializationWorker.Serialize<List<T>>(data, _appSettings.Directory);
+            await _serializationWorker.Serialize<List<T>>(data, str);
         }
 
-        public async Task UpdateObject(T obj)
+        public async Task UpdateObjectAsync(T obj)
         {
-            await DeleteObject(obj);
-            await CreateObject(obj);
+            await DeleteObjectAsync(obj);
+            await CreateObjectAsync(obj);
         }
 
-        public async Task DeleteObject(T obj)
+        public async Task DeleteObjectAsync(T obj)
         {
-            data = await GetAll();
+            var str = this.GetName(typeof(T));
+            data = (await GetAllAsync(typeof(T))).ToList();
             var objToRemove = data.FirstOrDefault(s => s.Id == obj.Id);
             data.Remove(objToRemove);
-            await _serializationWorker.Serialize<List<T>>(data, _appSettings.Directory);
+            await _serializationWorker.Serialize<List<T>>(data, str);
+        }
+
+        private string GetName(Type type)
+        {
+            string x = String.Empty;
+
+            switch (type.Name)
+            {
+                case "Room":
+                    x = _appSettings.RoomsDirectory;
+                    break;
+                
+                case "User":
+                    x = _appSettings.UsersDirectory;
+                    break;
+                
+                case "RoomUsers":
+                    x = _appSettings.RoomUsersDirectory;
+                    break;
+                
+            }
+
+            return x;
         }
     }
 }

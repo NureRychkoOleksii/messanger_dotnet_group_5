@@ -2,9 +2,9 @@
 
 namespace Core.Models
 {
-    public class RoomUsers
+    public class RoomUsers : IdKey
     {
-        public Room Room { get; set; }
-        public List<User> Users { get; set; }
+        public int RoomId { get; set; }
+        public int UserId { get; set; }
     }
 }
