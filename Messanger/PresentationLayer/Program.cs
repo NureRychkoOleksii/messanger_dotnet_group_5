@@ -19,13 +19,14 @@ namespace Messanger
         {
             // E:\dotnet messanger\Messanger\PresentationLayer
             var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false)
+                .SetBasePath(@"E:\Dev\.NET bootcamp\messanger_dotnet_group_5\Messanger\PresentationLayer")
+                .AddJsonFile(@"appsettings.json", optional: false)
                 .AddEnvironmentVariables()
                 .Build();
             services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
 
             services.AddScoped<App>();
+            services.AddScoped<ConsoleInterface>();
             
             BLL.DependencyRegistrar.ConfigureServices(services);
         }
