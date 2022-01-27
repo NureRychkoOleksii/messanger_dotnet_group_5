@@ -18,8 +18,10 @@ namespace Messanger
         private static void ConfigureServices(IServiceCollection services)
         {
             // E:\dotnet messanger\Messanger\PresentationLayer
+            // E:\Dev\.NET bootcamp\messanger_dotnet_group_5\Messanger\PresentationLayer
+            // C:\Users\aleks\Desktop\messanger_dotnet_group_5\Messanger\PresentationLayer
             var configuration = new ConfigurationBuilder()
-                .SetBasePath(@"E:\Dev\.NET bootcamp\messanger_dotnet_group_5\Messanger\PresentationLayer")
+                .SetBasePath(@"C:\Users\aleks\Desktop\messanger_dotnet_group_5\Messanger\PresentationLayer")
                 .AddJsonFile(@"appsettings.json", optional: false)
                 .AddEnvironmentVariables()
                 .Build();

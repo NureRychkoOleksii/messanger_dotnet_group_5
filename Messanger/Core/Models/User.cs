@@ -9,6 +9,8 @@ namespace Core
         
         public string Password { get; set; }
         
+        public string Email { get; set; }
+        
         // public List<Room> Room { get; set; }
         //
         // public List<Role> Roles { get; set; }
