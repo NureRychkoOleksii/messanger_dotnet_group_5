@@ -9,5 +9,7 @@ namespace BLL.Abstractions.Interfaces
         void DeleteRoom(Room room);
         void UpdateRoom(Room room);
         IEnumerable<Room> GetRooms();
+        Room GetRoomByName(string name);
+        bool RoomExists(string name);
     }
 }

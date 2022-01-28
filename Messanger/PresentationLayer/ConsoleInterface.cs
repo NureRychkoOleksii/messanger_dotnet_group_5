@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BLL;
 using BLL.Abstractions.Interfaces;
 using Core;
+using Core.Models;
 
 namespace Messanger
 {
@@ -13,11 +14,15 @@ namespace Messanger
     {
         private readonly Session _session;
         private readonly IUserService _userService;
+        private readonly IRoomService _roomService;
+        private readonly IRoomUsersService _roomUsersService;
 
-        public ConsoleInterface(Session session, IUserService userService)
+        public ConsoleInterface(Session session, IUserService userService, IRoomService roomService, IRoomUsersService roomUsersService)
         {
             _session = session;
             _userService = userService;
+            _roomService = roomService;
+            _roomUsersService = roomUsersService;
         }
 
         public void Start()
@@ -30,6 +35,34 @@ namespace Messanger
 
                 Console.Write("Choose one option: ");
                 action = Console.ReadLine();
+            }
+        }
+
+        private void ResolveAction(string action)
+        {
+            switch (action.Trim().ToLower())
+            {
+                case "start":
+                    OpenStartPage();
+                    break;
+                case "main":
+                    OpenMainPage();
+                    break;
+                case "login":
+                    OpenLoginPage();
+                    break;
+                case "register":
+                    OpenRegisterPage();
+                    break;
+                case "logout":
+                    OpenLogoutPage();
+                    break;
+                case "create room":
+                    OpenCreateRoomPage();
+                    break;
+                default:
+                    Console.WriteLine($"No such page {action}");
+                    break;
             }
         }
 
@@ -53,6 +86,24 @@ namespace Messanger
                     "exit\n"
                     );
             }
+
+            Console.WriteLine(pageContent);
+        }
+
+        private void OpenMainPage()
+        {
+            if (!_session.IsUserLoggedIn)
+            {
+                Console.WriteLine("\nError: not logged in\n\n");
+                return;
+            }
+
+            string pageContent = string.Concat(
+                    "\nGo to:\n\n",
+                    "create room\n",
+                    "logout\n",
+                    "exit\n"
+                    );
 
             Console.WriteLine(pageContent);
         }
@@ -83,20 +134,6 @@ namespace Messanger
                     Console.WriteLine($"User {username} does not exist or the password is wrong, try again");
                 }
             }
-        }
-
-        private void OpenLogoutPage()
-        {
-            _session.TryLogout();
-
-            string pageContent = string.Concat(
-                    "\nGo to:\n\n",
-                    "login\n",
-                    "register\n",
-                    "exit\n"
-                    );
-
-            Console.WriteLine(pageContent);
         }
 
         private void OpenRegisterPage()
@@ -170,42 +207,55 @@ namespace Messanger
 
                 Console.WriteLine(pageContent);
             }
+
         }
 
-        private void ResolveAction(string action)
+        private void OpenLogoutPage()
         {
-            switch (action)
-            {
-                case "start":
-                    OpenStartPage();
-                    break;
-                case "main":
-                    OpenMainPage();
-                    break;
-                case "login":
-                    OpenLoginPage();
-                    break;
-                case "register":
-                    OpenRegisterPage();
-                    break;
-                case "logout":
-                    OpenLogoutPage();
-                    break;
-                default:
-                    Console.WriteLine($"No such page {action}");
-                    break;
-            }
+            _session.TryLogout();
+
+            string pageContent = string.Concat(
+                    "\nGo to:\n\n",
+                    "login\n",
+                    "register\n",
+                    "exit\n"
+                    );
+
+            Console.WriteLine(pageContent);
         }
 
-        private void OpenMainPage()
+        private void OpenCreateRoomPage()
         {
             if (!_session.IsUserLoggedIn)
             {
-                Console.WriteLine("Error: not logged in");
+                Console.WriteLine("\nError: not logged in\n\n");
                 return;
             }
 
-            Console.WriteLine("Main");
+            // create room
+            Console.Write("Enter room name: ");
+            string roomName = Console.ReadLine();
+
+            while (_roomService.RoomExists(roomName))
+            {
+                Console.WriteLine($"Room {roomName} already exists");
+                Console.Write("Enter room name: ");
+                roomName = Console.ReadLine();
+            }
+
+            Room roomToCreate = new Room { RoomName = roomName };
+            _roomService.CreateRoom(roomToCreate);
+
+            Room room = _roomService.GetRoomByName(roomName);
+
+            int userId = _session.CurrentUser.Id;
+            int roomId = room.Id;
+
+            RoomUsers roomUser = new RoomUsers { RoomId = roomId, UserId = userId };
+
+            _roomUsersService.CreateRoomUsers(roomUser);
+
+            OpenMainPage();
         }
     }
 }
