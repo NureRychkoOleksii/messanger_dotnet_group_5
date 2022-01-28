@@ -7,5 +7,7 @@
         public string RoomsDirectory { get; set; }
         
         public string RoomUsersDirectory { get; set; }
+        
+        public string Email { get; set; }
     }
 }

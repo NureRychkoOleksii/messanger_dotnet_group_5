@@ -13,11 +13,13 @@ namespace Messanger
     {
         private readonly Session _session;
         private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
 
-        public ConsoleInterface(Session session, IUserService userService)
+        public ConsoleInterface(Session session, IUserService userService, IEmailService emailService)
         {
             _session = session;
             _userService = userService;
+            _emailService = emailService;
         }
 
         public void Start()
@@ -143,7 +145,7 @@ namespace Messanger
 
                 User user = new User { Nickname = username, Password = password, Email = email};
                 _userService.CreateUser(user);
-
+                _emailService.SendingEmailOnRegistration(user);
                 _session.TryLogin(user.Nickname, user.Password);
 
                 // create register class
