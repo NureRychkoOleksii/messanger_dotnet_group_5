@@ -11,6 +11,7 @@ namespace BLL
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IRoomUsersService, RoomUsersService>();
+            services.AddScoped<Session>();
             DAL.DependencyRegistrar.ConfigureServices(services);
         }
     }
