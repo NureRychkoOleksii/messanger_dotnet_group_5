@@ -127,13 +127,27 @@ namespace Messanger
                 User user = new User() {Nickname = username, Email = email, Password = password};
                 _userService.CreateUser(user);
                 _session.TryLogin(user.Nickname, user.Password);
-                
-                string pageContent = string.Concat(
-                    "Go to:\n\n",
-                    "main\n",
-                    "logout\n",
-                    "exit\n"
-                );
+                string pageContent;
+
+                if (_session.IsUserLoggedIn)
+                {
+                    Console.WriteLine("Successfully logged in!\n");
+                    pageContent = string.Concat(
+                        "Go to:\n\n",
+                        "main\n",
+                        "logout\n",
+                        "exit\n"
+                    );
+                }
+                else
+                {
+                    pageContent = string.Concat(
+                        "Go to:\n\n",
+                        "login\n",
+                        "register\n",
+                        "exit\n"
+                    );
+                }
 
                 Console.WriteLine(pageContent);
                 //    // hash password
