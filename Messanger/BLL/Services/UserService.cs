@@ -47,19 +47,19 @@ namespace BLL.Services
             var userName = users.Where(user => user.Nickname == nickname).FirstOrDefault();
             string checkPassword = new string(@"^[a-zA-Z0-9!#$%&]{8,24}$");
             string checkEmail = new string( @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
-            if (userName != null)
+            if (userName != null || String.IsNullOrEmpty(nickname))
             {
-                Console.WriteLine("The given nickname is not unique.");
+                Console.WriteLine("The given nickname is not unique.\n");
                 return false;
             }
             else if (!Regex.IsMatch(email, checkEmail))
             {
-                Console.WriteLine("Invalid email.");
+                Console.WriteLine("Invalid email.\n");
                 return false;
             }
             else if (!Regex.IsMatch(password, checkPassword))
             {
-                Console.WriteLine("Invalid password.");
+                Console.WriteLine("Invalid password.\n");
                 return false;
             }
             else
