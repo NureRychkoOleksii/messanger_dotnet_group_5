@@ -33,6 +33,8 @@ namespace DAL.Services
         {
             var str = this.GetName(typeof(T));
             data = (await GetAllAsync(typeof(T))).ToList();
+            int lastId = data.OrderBy(x => x.Id).Last().Id;
+            obj.Id = ++lastId;
             data.Add(obj);
             await _serializationWorker.Serialize<List<T>>(data, str);
         }

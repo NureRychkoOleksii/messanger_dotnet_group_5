@@ -5,16 +5,19 @@ using System.Text;
 using System.Threading.Tasks;
 using BLL;
 using BLL.Abstractions.Interfaces;
+using Core;
 
 namespace Messanger
 {
     public class ConsoleInterface
     {
         private readonly Session _session;
+        private readonly IUserService _userService;
 
-        public ConsoleInterface(Session session)
+        public ConsoleInterface(Session session, IUserService userService)
         {
             _session = session;
+            _userService = userService;
         }
 
         public void Start()
@@ -37,14 +40,14 @@ namespace Messanger
             if (_session.IsUserLoggedIn)
             {
                 pageContent = string.Concat(
-                    "Go to:\n\n",
+                    "\nGo to:\n\n",
                     "logout\n"
                     );
             }
             else
             {
                 pageContent = string.Concat(
-                    "Go to:\n\n",
+                    "\nGo to:\n\n",
                     "login\n",
                     "register\n",
                     "exit\n"
@@ -67,7 +70,7 @@ namespace Messanger
                 if (_session.TryLogin(username, password))
                 {
                     string pageContent = string.Concat(
-                    "Go to:\n\n",
+                    "\nGo to:\n\n",
                     "main\n",
                     "logout\n",
                     "exit\n"
@@ -87,7 +90,7 @@ namespace Messanger
             _session.TryLogout();
 
             string pageContent = string.Concat(
-                    "Go to:\n\n",
+                    "\nGo to:\n\n",
                     "login\n",
                     "register\n",
                     "exit\n"
@@ -98,37 +101,57 @@ namespace Messanger
 
         private void OpenRegisterPage()
         {
-            //if (!_session.IsUserLoggedIn)
-            //{
-            //    Console.Write("Username: ");
-            //    string username = string.Empty;
+            if (!_session.IsUserLoggedIn)
+            {
+                Console.Write("Username: ");
+                string username = Console.ReadLine();
 
-            //    while (true)
-            //    {
-            //        username = Console.ReadLine();
-            //    }
+                while (_userService.UserExists(username))
+                {
+                    Console.WriteLine($"Name {username} is already taken");
+                    Console.Write("Username: ");
+                    username = Console.ReadLine();
+                }
 
-            //    // check if user exists
+                //Console.Write("Email: ");
+                //string email = Console.ReadLine();
 
-            //    Console.Write("Email: ");
-            //    string email = Console.ReadLine();
+                //// check if email is correct
+                //// check if email exists
 
-            //    // check if email is correct
-            //    // check if email exists
+                Console.Write("Password: ");
+                string password = Console.ReadLine();
 
-            //    Console.Write("Password: ");
-            //    string password = Console.ReadLine();
+                // check if password is good enough
 
-            //    Console.Write("Confirm password: ");
-            //    string confirmPassword = Console.ReadLine();
+                Console.Write("Confirm password: ");
+                string confirmPassword = Console.ReadLine();
 
-            //    // check if passwords match
-            //    // check if password is good enough
+                while (!password.Equals(confirmPassword))
+                {
+                    Console.WriteLine("Passwords did not match");
+                    Console.Write("Confirm password: ");
+                    confirmPassword = Console.ReadLine();
+                }
 
-            //    // hash password
-            //    // create new user
-            //    // log in
-            //}
+                // hash password
+
+                User user = new User { Nickname = username, Password = password };
+                _userService.CreateUser(user);
+
+                _session.TryLogin(user.Nickname, user.Password);
+
+                // create register class
+
+                string pageContent = string.Concat(
+                    "\nGo to:\n\n",
+                    "main\n",
+                    "logout\n",
+                    "exit\n"
+                    );
+
+                Console.WriteLine(pageContent);
+            }
         }
 
         private void ResolveAction(string action)

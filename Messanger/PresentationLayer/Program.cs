@@ -19,7 +19,7 @@ namespace Messanger
         {
             // E:\dotnet messanger\Messanger\PresentationLayer
             var configuration = new ConfigurationBuilder()
-                .SetBasePath(@"E:\Dev\.NET bootcamp\messanger_dotnet_group_5\Messanger\PresentationLayer")
+                .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile(@"appsettings.json", optional: false)
                 .AddEnvironmentVariables()
                 .Build();

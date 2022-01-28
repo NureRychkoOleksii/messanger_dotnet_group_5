@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using BLL.Abstractions.Interfaces;
 using Core;
 using DAL.Abstractions.Interfaces;
@@ -33,6 +34,16 @@ namespace BLL.Services
         public IEnumerable<User> GetUsers()
         {
            return _repository.GetAllAsync(typeof(User)).Result;
+        }
+
+        public User GetUserByName(string username)
+        {
+            return _repository.GetAllAsync(typeof(User)).Result.Where(user => user.Nickname == username).FirstOrDefault();
+        }
+
+        public bool UserExists(string username)
+        {
+            return _repository.GetAllAsync(typeof(User)).Result.Where(user => user.Nickname == username).FirstOrDefault() != null;
         }
     }
 }
