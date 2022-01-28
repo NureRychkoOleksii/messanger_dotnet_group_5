@@ -60,6 +60,9 @@ namespace Messanger
                 case "create room":
                     OpenCreateRoomPage();
                     break;
+                case "view rooms":
+                    OpenViewUserRooms();
+                    break;
                 default:
                     Console.WriteLine($"No such page {action}");
                     break;
@@ -99,7 +102,9 @@ namespace Messanger
             }
 
             string pageContent = string.Concat(
+                    $"\nHello, {_session.CurrentUser.Nickname}!\n",
                     "\nGo to:\n\n",
+                    "view rooms\n",
                     "create room\n",
                     "logout\n",
                     "exit\n"
@@ -246,7 +251,7 @@ namespace Messanger
             Room roomToCreate = new Room { RoomName = roomName };
             _roomService.CreateRoom(roomToCreate);
 
-            Room room = _roomService.GetRoomByName(roomName);
+            Room room = _roomService.GetRoom(roomName);
 
             int userId = _session.CurrentUser.Id;
             int roomId = room.Id;
@@ -256,6 +261,31 @@ namespace Messanger
             _roomUsersService.CreateRoomUsers(roomUser);
 
             OpenMainPage();
+        }
+
+        private void OpenViewUserRooms()
+        {
+            if (!_session.IsUserLoggedIn)
+            {
+                Console.WriteLine("\nError: not logged in\n\n");
+                return;
+            }
+
+            var roomUsers = _roomUsersService.GetRoomUsersOfUser(_session.CurrentUser);
+
+            Console.WriteLine();
+
+            foreach (RoomUsers roomUser in roomUsers)
+            {
+                Room room = _roomService.GetRoom(roomUser.RoomId);
+
+                if (room != null)
+                {
+                    Console.WriteLine(room.RoomName);
+                }
+            }
+
+            Console.WriteLine();
         }
     }
 }

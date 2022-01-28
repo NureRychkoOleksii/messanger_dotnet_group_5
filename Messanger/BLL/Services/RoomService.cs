@@ -35,11 +35,19 @@ namespace BLL.Services
             return _repository.GetAllAsync(typeof(Room)).Result;
         }
 
-        public Room GetRoomByName(string name)
+        public Room GetRoom(string name)
         {
             return _repository
                 .GetAllAsync(typeof(Room))
                 .Result.Where(room => room.RoomName == name)
+                .FirstOrDefault();
+        }
+
+        public Room GetRoom(int id)
+        {
+            return _repository
+                .GetAllAsync(typeof(Room))
+                .Result.Where(room => room.Id == id)
                 .FirstOrDefault();
         }
 

@@ -9,7 +9,8 @@ namespace BLL.Abstractions.Interfaces
         void DeleteUser(User user);
         void UpdateUser(User user);
         IEnumerable<User> GetUsers();
-        User GetUserByName(string username);
+        User GetUser(string username);
+        User GetUser(int id);
         bool UserExists(string username);
     }
 }

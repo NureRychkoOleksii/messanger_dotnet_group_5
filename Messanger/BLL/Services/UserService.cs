@@ -41,12 +41,20 @@ namespace BLL.Services
            return _repository.GetAllAsync(typeof(User)).Result;
         }
         
-        public User GetUserByName(string username)
+        public User GetUser(string username)
         {
             return _repository
-                .GetAllAsync(typeof(User)).
-                Result.Where(user => user.Nickname == username).
-                FirstOrDefault();
+                .GetAllAsync(typeof(User))
+                .Result.Where(user => user.Nickname == username)
+                .FirstOrDefault();
+        }
+
+        public User GetUser(int id)
+        {
+            return _repository
+                .GetAllAsync(typeof(User))
+                .Result.Where(user => user.Id == id)
+                .FirstOrDefault();
         }
 
         public bool UserExists(string username)

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using BLL.Abstractions.Interfaces;
+using Core;
 using Core.Models;
 using DAL.Abstractions.Interfaces;
 
@@ -32,6 +34,13 @@ namespace BLL.Services
         public IEnumerable<RoomUsers> GetRoomUsers()
         {
             return _repository.GetAllAsync(typeof(RoomUsers)).Result;
+        }
+
+        public IEnumerable<RoomUsers> GetRoomUsersOfUser(User user)
+        {
+            return _repository
+                .GetAllAsync(typeof(RoomUsers))
+                .Result.Where(roomUser => roomUser.UserId == user.Id);
         }
     }
 }

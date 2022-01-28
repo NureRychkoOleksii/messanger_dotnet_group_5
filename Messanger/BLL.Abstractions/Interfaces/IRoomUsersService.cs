@@ -10,5 +10,6 @@ namespace BLL.Abstractions.Interfaces
         void DeleteRoomUsers(RoomUsers roomUsers);
         void UpdateRoomUsers(RoomUsers roomUsers);
         IEnumerable<RoomUsers> GetRoomUsers();
+        IEnumerable<RoomUsers> GetRoomUsersOfUser(User user);
     }
 }
