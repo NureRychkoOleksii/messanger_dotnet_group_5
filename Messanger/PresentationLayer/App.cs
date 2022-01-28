@@ -6,16 +6,17 @@ namespace Messanger
     public class App
     {
         private readonly IUserService _userService;
+        private readonly ConsoleInterface _consoleInterface;
 
-        public App(IUserService userService)
+        public App(IUserService userService, ConsoleInterface consoleInterface)
         {
             _userService = userService;
+            _consoleInterface = consoleInterface;
         }
 
         public void StartApp()
         {
-            var x = new User() {Nickname = "Moonler", Password = "1234", Id = 1};
-            _userService.CreateUser(x);
+            _consoleInterface.Start();
         }
     }
 }
