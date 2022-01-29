@@ -42,6 +42,7 @@ namespace DAL.Services
 
         public async Task UpdateObjectAsync(T obj)
         {
+            int id = obj.Id;
             await DeleteObjectAsync(obj);
             await CreateObjectAsync(obj);
         }
@@ -73,6 +74,9 @@ namespace DAL.Services
                     x = _appSettings.RoomUsersDirectory;
                     break;
                 
+                case "UsersInvitation":
+                    x = "..\\..\\..\\..\\DAL\\JSON files\\UsersInvitation.json";
+                    break;
             }
 
             return x;

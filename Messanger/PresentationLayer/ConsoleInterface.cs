@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using BLL;
 using BLL.Abstractions.Interfaces;
@@ -18,15 +19,17 @@ namespace Messanger
         private readonly IRoomService _roomService;
         private readonly IRoomUsersService _roomUsersService;
         private readonly IEmailService _emailService;
+        private readonly IUsersInvitationService _usersInvitationService;
 
         public ConsoleInterface(Session session, IUserService userService, IRoomService roomService,
-            IRoomUsersService roomUsersService, IEmailService emailService)
+            IRoomUsersService roomUsersService, IEmailService emailService, IUsersInvitationService usersInvitationService)
         {
             _session = session;
             _userService = userService;
             _roomService = roomService;
             _roomUsersService = roomUsersService;
             _emailService = emailService;
+            _usersInvitationService = usersInvitationService;
         }
 
         public void Start()
@@ -84,12 +87,118 @@ namespace Messanger
                 case "view roles":
                     OpenViewRolesPage();
                     break;
+                
+                case "invite user":
+                    OpenInvitationPage();
+                    break;
+                
+                case "my invitations":
+                    OpenMyInvitationsPage();
+                    break;
+
                 default:
                     Console.WriteLine($"No such page {action}");
                     break;
             }
         }
 
+        private void OpenMyInvitationsPage()
+        {
+            var usersInvitations = _usersInvitationService.GetUsers().ToList();
+
+            var isUserInvited = usersInvitations.Where(user => _session.CurrentUser.Id == user.UserId).FirstOrDefault();
+
+            var roomName = _roomService.GetRooms().ToList().Where(room => room.Id == isUserInvited.RoomId).FirstOrDefault().RoomName;
+
+            if (isUserInvited != null)
+            {
+                Console.WriteLine($"You are invited in room {roomName}, do you want to accept this invitation?");
+                var answer = Console.ReadLine().ToLower();
+                if (answer.Equals("yes"))
+                {
+                    var roomUsers = new RoomUsers()
+                        {RoomId = isUserInvited.RoomId, UserId = isUserInvited.UserId, UserRole = 1};
+                    _roomUsersService.CreateRoomUsers(roomUsers);
+                    _usersInvitationService.RemoveUser(isUserInvited.Id,_session.CurrentRoom.Id);
+                }
+                else
+                {
+                    Console.WriteLine(":(");
+                    //_usersInvitationService.RemoveUser(isUserInvited.Id,_session.CurrentRoom.Id);
+                }
+            }
+            else
+            {
+                Console.WriteLine("You have zero invitations");
+            }
+        }
+        
+        private void OpenInvitationPage()
+        {
+
+            Console.WriteLine("Enter a nickname of user or 'exit'");
+
+            string user = Console.ReadLine();
+
+            User userToInvite = null;
+            userToInvite = _userService.GetUser(user);
+
+            Thread.Sleep(1000);
+            // var userToInvite = _userService.GetUser(user);
+
+            if (userToInvite != null)
+            {
+                _usersInvitationService.AddUser(userToInvite.Id, _session.CurrentRoom.Id);
+                _emailService.SendingEmailOnInviting(userToInvite,_session.CurrentRoom.RoomName);
+            }
+            else
+            {
+                Console.WriteLine("This user is not existing");
+            }
+            // string pageContent = String.Empty;
+            //
+            // if (_session.IsUserLoggedIn)
+            // {
+            //     pageContent = string.Concat(
+            //         "\nGo to:\n\n",
+            //         "logout\n"
+            //     );
+            // }
+            // else
+            // {
+            //     pageContent = string.Concat(
+            //         "\nWrite a nickname of user:\n\n",
+            //         "invite user\n",
+            //         "exit\n"
+            //     );
+            // }
+            //
+            // Console.WriteLine(pageContent);
+        }
+        
+        private void OpenInvitationUserPage()
+        {
+            string pageContent = String.Empty;
+            
+            if (_session.IsUserLoggedIn)
+            {
+                pageContent = string.Concat(
+                    "\nGo to:\n\n",
+                    "logout\n"
+                );
+            }
+            else
+            {
+                pageContent = string.Concat(
+                    "\nGo to:\n\n",
+                    "invite user\n",
+                    "exit\n"
+                );
+            }
+
+            Console.WriteLine(pageContent);
+        }
+        
         private void OpenStartPage()
         {
             string pageContent = string.Empty;
@@ -127,6 +236,7 @@ namespace Messanger
                 "\nGo to:\n\n",
                 "enter room\n",
                 "view rooms\n",
+                "my invitations\n",
                 "create room\n",
                 "logout\n",
                 "exit\n"
@@ -274,9 +384,20 @@ namespace Messanger
             _roomService.CreateRoom(roomToCreate);
             
             Console.WriteLine($"Room {roomName} was successfully created!");
+            
+            Thread.Sleep(1000);
 
-            Room room = _roomService.GetRoom(roomName);
+            //Room rooms = _roomService.GetRooms().ToList().LastOrDefault();
 
+
+            Room room = null;
+
+            while (room == null)
+            {
+                room = _roomService.GetRoom(roomName);
+            }
+
+            
             int userId = _session.CurrentUser.Id;
             int roomId = room.Id;
 
@@ -327,6 +448,7 @@ namespace Messanger
                 pageContent = string.Concat(
                     "\nGo to:\n\n",
                     "exit room\n",
+                    "invite user\n",
                     "create role\n",
                     "delete role\n",
                     "view roles\n"
@@ -342,6 +464,7 @@ namespace Messanger
                     "enter room\n",
                     "view rooms\n",
                     "create room\n",
+                    "invite user\n",
                     "logout\n",
                     "exit\n"
                 );
