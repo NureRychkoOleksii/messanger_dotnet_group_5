@@ -2,13 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d586870b-fa5f-4c1c-98bc-addcd014ac73" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BLL/Services/RoomService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BLL/Services/RoomService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BLL/Services/RoomUsersService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BLL/Services/RoomUsersService.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Core/Models/Role.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Models/Role.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Core/Models/Room.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Models/Room.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Models/RoomUsers.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Models/RoomUsers.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DAL/JSON files/RoomUsers.json" beforeDir="false" afterPath="$PROJECT_DIR$/DAL/JSON files/RoomUsers.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DAL/JSON files/Rooms.json" beforeDir="false" afterPath="$PROJECT_DIR$/DAL/JSON files/Rooms.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DAL/JSON files/Users.json" beforeDir="false" afterPath="$PROJECT_DIR$/DAL/JSON files/Users.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PresentationLayer/ConsoleInterface.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PresentationLayer/ConsoleInterface.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -39,7 +39,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1643390898830</updated>
-      <workItem from="1643390900930" duration="2080000" />
+      <workItem from="1643390900930" duration="6321000" />
     </task>
     <servers />
   </component>

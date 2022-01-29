@@ -9,7 +9,14 @@ namespace Core
 
         public Dictionary<int, Role> Roles = new Dictionary<int, Role>()
         {
-            [0] = new Role() {RoleName = "Admin"},
+            [0] = new Role()
+            {
+                RoleName = "Admin", Permissions = new Dictionary<string, bool>()
+                {
+                    ["Manage roles"] = true,
+                    ["Rename room"] = true
+                }
+            },
             [1] = new Role() {RoleName = "User"}
         };
 

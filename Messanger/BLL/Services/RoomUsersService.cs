@@ -47,28 +47,61 @@ namespace BLL.Services
                 .Result.Where(roomUser => roomUser.UserId == user.Id);
         }
 
-        public string GetUserRole(User user, Room room)
+        // public string GetUserRole(User user, Room room)
+        // {
+        //     IList<RoomUsers> roomUser = _repository
+        //         .GetAllAsync(typeof(RoomUsers))
+        //         .Result.Where(roomUser => roomUser.UserId == user.Id
+        //                                   && roomUser.RoomId == room.Id).ToList();
+        //     int roleId = roomUser[0].RoomId;
+        //     Role role = room.Roles[roleId];
+        //     return role.RoleName;
+        //
+        // }
+        //
+        // public string GetUserRole(User user, Room room, out int roleId)
+        // {
+        //     IList<RoomUsers> roomUsers = _repository
+        //         .GetAllAsync(typeof(RoomUsers))
+        //         .Result.Where(roomUser => roomUser.UserId == user.Id
+        //                                   && roomUser.RoomId == room.Id).ToList();
+        //     roleId = roomUsers[0].RoomId;
+        //     Role role = room.Roles[roleId];
+        //     return role.RoleName;
+        // }
+
+        public Role GetUserRole(User user, Room room)
         {
-            IList<RoomUsers> roomUser = _repository
+            RoomUsers roomUser = _repository
                 .GetAllAsync(typeof(RoomUsers))
                 .Result.Where(roomUser => roomUser.UserId == user.Id
-                                          && roomUser.RoomId == room.Id).ToList();
-            int roleId = roomUser[0].RoomId;
-            Role role = room.Roles[roleId];
-            return role.RoleName;
+                                          && roomUser.RoomId == room.Id)
+                .FirstOrDefault();
+            
+            Role userRole = room.Roles
+                .Where(role => role.Key == roomUser.UserRole)
+                .FirstOrDefault().Value;
 
+            return userRole;
         }
         
-        public string GetUserRole(User user, Room room, out int roleId)
+        public Role GetUserRole(User user, Room room, out int roleId)
         {
-            IList<RoomUsers> roomUsers = _repository
+            RoomUsers roomUser = _repository
                 .GetAllAsync(typeof(RoomUsers))
                 .Result.Where(roomUser => roomUser.UserId == user.Id
-                                          && roomUser.RoomId == room.Id).ToList();
-            roleId = roomUsers[0].RoomId;
-            Role role = room.Roles[roleId];
-            return role.RoleName;
+                                          && roomUser.RoomId == room.Id)
+                .FirstOrDefault();
+            
+            Role userRole = room.Roles
+                .Where(role => role.Key == roomUser.UserRole)
+                .FirstOrDefault().Value;
+
+            roleId = roomUser.UserRole;
+            
+            return userRole;
         }
+        
 
         
         public IEnumerable<Room> GetRoomsOfUser(User user)

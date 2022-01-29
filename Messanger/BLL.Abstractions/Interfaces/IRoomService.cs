@@ -14,6 +14,7 @@ namespace BLL.Abstractions.Interfaces
         bool RoomExists(string name);
         bool CreateRole(string roleName, Room room);
         bool DeleteRole(string roleName, Room room);
+        IEnumerable<Role> GetAllRoles(Room room);
 
 
     }

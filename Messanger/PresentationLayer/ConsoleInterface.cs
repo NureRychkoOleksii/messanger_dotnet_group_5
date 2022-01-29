@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using BLL;
@@ -17,7 +18,8 @@ namespace Messanger
         private readonly IRoomService _roomService;
         private readonly IRoomUsersService _roomUsersService;
 
-        public ConsoleInterface(Session session, IUserService userService, IRoomService roomService, IRoomUsersService roomUsersService)
+        public ConsoleInterface(Session session, IUserService userService, IRoomService roomService,
+            IRoomUsersService roomUsersService)
         {
             _session = session;
             _userService = userService;
@@ -28,7 +30,7 @@ namespace Messanger
         public void Start()
         {
             string action = "start";
-            
+
             while (!action.Equals("exit"))
             {
                 ResolveAction(action);
@@ -71,6 +73,15 @@ namespace Messanger
                 case "exit room":
                     OpenExitRoomPage();
                     break;
+                case "create role":
+                    OpenCreateRolePage();
+                    break;
+                case "delete role":
+                    OpenDeleteRolePage();
+                    break;
+                case "view roles":
+                    OpenViewRolesPage();
+                    break;
                 default:
                     Console.WriteLine($"No such page {action}");
                     break;
@@ -80,13 +91,13 @@ namespace Messanger
         private void OpenStartPage()
         {
             string pageContent = string.Empty;
-            
+
             if (_session.IsUserLoggedIn)
             {
                 pageContent = string.Concat(
                     "\nGo to:\n\n",
                     "logout\n"
-                    );
+                );
             }
             else
             {
@@ -95,7 +106,7 @@ namespace Messanger
                     "login\n",
                     "register\n",
                     "exit\n"
-                    );
+                );
             }
 
             Console.WriteLine(pageContent);
@@ -110,14 +121,14 @@ namespace Messanger
             }
 
             string pageContent = string.Concat(
-                    $"\nHello, {_session.CurrentUser.Nickname}!\n",
-                    "\nGo to:\n\n",
-                    "enter room\n",
-                    "view rooms\n",
-                    "create room\n",
-                    "logout\n",
-                    "exit\n"
-                    );
+                $"\nHello, {_session.CurrentUser.Nickname}!\n",
+                "\nGo to:\n\n",
+                "enter room\n",
+                "view rooms\n",
+                "create room\n",
+                "logout\n",
+                "exit\n"
+            );
 
             Console.WriteLine(pageContent);
         }
@@ -135,10 +146,10 @@ namespace Messanger
                 if (_session.TryLogin(username, password))
                 {
                     string pageContent = string.Concat(
-                    "\nGo to:\n\n",
-                    "main\n",
-                    "logout\n",
-                    "exit\n"
+                        "\nGo to:\n\n",
+                        "main\n",
+                        "logout\n",
+                        "exit\n"
                     );
 
                     Console.WriteLine(pageContent);
@@ -192,7 +203,7 @@ namespace Messanger
 
                 // hash password
 
-                User user = new User { Nickname = username, Password = password, Email = email};
+                User user = new User {Nickname = username, Password = password, Email = email};
                 _userService.CreateUser(user);
 
                 _session.TryLogin(user.Nickname, user.Password);
@@ -229,11 +240,11 @@ namespace Messanger
             _session.TryLogout();
 
             string pageContent = string.Concat(
-                    "\nGo to:\n\n",
-                    "login\n",
-                    "register\n",
-                    "exit\n"
-                    );
+                "\nGo to:\n\n",
+                "login\n",
+                "register\n",
+                "exit\n"
+            );
 
             Console.WriteLine(pageContent);
         }
@@ -257,15 +268,17 @@ namespace Messanger
                 roomName = Console.ReadLine();
             }
 
-            Room roomToCreate = new Room { RoomName = roomName };
+            Room roomToCreate = new Room {RoomName = roomName};
             _roomService.CreateRoom(roomToCreate);
+            
+            Console.WriteLine($"Room {roomName} was successfully created!");
 
             Room room = _roomService.GetRoom(roomName);
 
             int userId = _session.CurrentUser.Id;
             int roomId = room.Id;
 
-            RoomUsers roomUser = new RoomUsers { RoomId = roomId, UserId = userId, UserRole = 0};
+            RoomUsers roomUser = new RoomUsers {RoomId = roomId, UserId = userId, UserRole = 0};
 
             _roomUsersService.CreateRoomUsers(roomUser);
 
@@ -288,6 +301,7 @@ namespace Messanger
             {
                 Console.WriteLine(room.RoomName);
             }
+
             Console.WriteLine();
         }
 
@@ -298,7 +312,7 @@ namespace Messanger
                 Console.WriteLine("\nError: not logged in\n\n");
                 return;
             }
-            
+
             string pageContent;
             Console.Write("Enter the name of the room: ");
             string roomName = Console.ReadLine().Trim();
@@ -310,13 +324,16 @@ namespace Messanger
                 Console.WriteLine($"Welcome to the room {_session.CurrentRoom.RoomName}!");
                 pageContent = string.Concat(
                     "\nGo to:\n\n",
-                    "exit room\n"
+                    "exit room\n",
+                    "create role\n",
+                    "delete role\n",
+                    "view roles\n"
                 );
             }
             else
             {
                 Console.WriteLine($"No room {roomName} in your list of rooms");
-                
+
                 pageContent = string.Concat(
                     $"\nHello, {_session.CurrentUser.Nickname}!\n",
                     "\nGo to:\n\n",
@@ -327,7 +344,7 @@ namespace Messanger
                     "exit\n"
                 );
             }
-            
+
             Console.WriteLine(pageContent);
         }
 
@@ -357,6 +374,112 @@ namespace Messanger
             else
             {
                 Console.WriteLine("You are not in the room right now.");
+            }
+
+            Console.WriteLine(pageContent);
+        }
+
+        public void OpenCreateRolePage()
+        {
+            if (!_session.IsUserLoggedIn)
+            {
+                Console.WriteLine("\nError: not logged in\n\n");
+                return;
+            }
+
+            Role userRole = _roomUsersService.GetUserRole(_session.CurrentUser, _session.CurrentRoom, out int roleId);
+            string pageContent = string.Concat(
+                "\nGo to:\n\n",
+                "exit room\n",
+                "create role\n",
+                "delete tole\n",
+                "view roles\n"
+            );
+            
+            if (_session.CurrentRoom.Roles[roleId].Permissions["Manage roles"])
+            {
+                Console.Write("Enter the name of the new role: ");
+                string newRoleName = Console.ReadLine().Trim();
+                bool hasCreatedRole = _roomService.CreateRole(newRoleName, _session.CurrentRoom);
+
+                if (hasCreatedRole)
+                {
+                    Console.WriteLine($"New role {newRoleName} was successfully created!\n");
+                }
+                else
+                {
+                    Console.WriteLine($"Role {newRoleName} already exists.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("You don't have permissions to create roles.");
+            }
+            
+            Console.WriteLine(pageContent);
+        }
+
+        public void OpenDeleteRolePage()
+        {
+            if (!_session.IsUserLoggedIn)
+            {
+                Console.WriteLine("\nError: not logged in\n\n");
+                return;
+            }
+
+            Role userRole = _roomUsersService.GetUserRole(_session.CurrentUser, _session.CurrentRoom, out int roleId);
+            string pageContent = string.Concat(
+                    "\nGo to:\n\n",
+                    "exit room\n",
+                    "create role\n",
+                    "delete tole\n",
+                    "view roles\n"
+                    );
+
+            if (_session.CurrentRoom.Roles[roleId].Permissions["Manage roles"])
+            {
+                Console.Write("Enter the name of the role to delete: ");
+                string roleToDelete = Console.ReadLine().Trim();
+                bool hasDeletedRole = _roomService.DeleteRole(roleToDelete, _session.CurrentRoom);
+
+                if (hasDeletedRole)
+                {
+                    Console.WriteLine($"Role {roleToDelete} was successfully deleted!");
+                }
+                else
+                {
+                    Console.WriteLine($"No role {roleToDelete} exists.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("You don't have permissions to delete roles.");
+            }
+            
+            Console.WriteLine(pageContent);
+        }
+
+        public void OpenViewRolesPage()
+        {
+            if (!_session.IsUserLoggedIn)
+            {
+                Console.WriteLine("\nError: not logged in\n\n");
+                return;
+            }
+
+            IEnumerable<Role> roles = _roomService.GetAllRoles(_session.CurrentRoom);
+            string pageContent = string.Concat(
+                "\nGo to:\n\n",
+                "exit room\n",
+                "create role\n",
+                "delete tole\n",
+                "view roles\n"
+            );
+            
+            Console.WriteLine();
+            foreach (Role role in roles)
+            {
+                Console.WriteLine(role.RoleName);
             }
             
             Console.WriteLine(pageContent);
