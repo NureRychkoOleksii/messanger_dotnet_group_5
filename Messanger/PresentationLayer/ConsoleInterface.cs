@@ -17,14 +17,16 @@ namespace Messanger
         private readonly IUserService _userService;
         private readonly IRoomService _roomService;
         private readonly IRoomUsersService _roomUsersService;
+        private readonly IEmailService _emailService;
 
         public ConsoleInterface(Session session, IUserService userService, IRoomService roomService,
-            IRoomUsersService roomUsersService)
+            IRoomUsersService roomUsersService, IEmailService emailService)
         {
             _session = session;
             _userService = userService;
             _roomService = roomService;
             _roomUsersService = roomUsersService;
+            _emailService = emailService;
         }
 
         public void Start()
@@ -205,7 +207,7 @@ namespace Messanger
 
                 User user = new User {Nickname = username, Password = password, Email = email};
                 _userService.CreateUser(user);
-
+                _emailService.SendingEmailOnRegistration(user);
                 _session.TryLogin(user.Nickname, user.Password);
 
                 // create register class
