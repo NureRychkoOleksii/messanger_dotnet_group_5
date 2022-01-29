@@ -108,7 +108,7 @@ namespace BLL.Services
         {
             var roomUsers = _repository
                 .GetAllAsync(typeof(RoomUsers))
-                .Result.Where(roomUser => roomUser.UserId == user.Id);
+                .Result.Where(roomUser => roomUser.UserId == user.Id).ToList();
 
             List<Room> rooms = new List<Room>();
 
@@ -116,7 +116,8 @@ namespace BLL.Services
             {
                 rooms.Add(_roomService.GetRoom(roomUser.RoomId));
             }
-
+            
+            
             return rooms;
         }
 
@@ -124,7 +125,7 @@ namespace BLL.Services
         {
             var roomUsers = _repository
                 .GetAllAsync(typeof(RoomUsers))
-                .Result.Where(roomUser => roomUser.RoomId == room.Id);
+                .Result.Where(roomUser => roomUser.RoomId == room.Id).ToList();
 
             List<User> users = new List<User>();
 
