@@ -50,5 +50,40 @@ namespace BLL.Services
             Client.EnableSsl = true;
             await Client.SendMailAsync(Message);
         }
+
+        public async void SendingEmailOnInviting(User user, string roomName)
+        {
+            SmtpClient Client = new SmtpClient()
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+
+                Credentials = new NetworkCredential()
+                {
+                    UserName = "msl.corpor@gmail.com".Trim(),
+                    Password = "21918111".Trim()
+                }
+            };
+            MailAddress FromEmail = new MailAddress("msl.corpor@gmail.com", "MSL corp.");
+
+            MailAddress ToEmail = new MailAddress(user.Email);
+
+            MailMessage Message = new MailMessage()
+            {
+                From = FromEmail,
+                Subject = "Messenger",
+                Body = string.Concat(
+                    $"You have received an invitation in room {roomName}\n",
+                    "Accept it or not in our messenger\n",
+                    $"If you have some questions, write an email on msl.corpor@gmail.com"
+                )
+            };
+            Message.To.Add(ToEmail);
+            Client.EnableSsl = true;
+            await Client.SendMailAsync(Message);
+        }
     }
 }

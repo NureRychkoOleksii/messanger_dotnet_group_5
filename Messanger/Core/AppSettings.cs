@@ -8,6 +8,6 @@
         
         public string RoomUsersDirectory { get; set; }
         
-        public string Email { get; set; }
+        public string UsersInvitationDirectory { get; set; }
     }
 }

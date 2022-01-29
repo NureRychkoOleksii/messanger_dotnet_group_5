@@ -12,6 +12,7 @@ namespace BLL
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IRoomUsersService, RoomUsersService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IUsersInvitationService, UserInvitationService>();
             services.AddScoped<Session>();
             DAL.DependencyRegistrar.ConfigureServices(services);
         }
