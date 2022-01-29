@@ -271,13 +271,33 @@ namespace Messanger
                 return;
             }
 
-            var roomUsers = _roomUsersService.GetRoomsOfUser(_session.CurrentUser);
+            var rooms = _roomUsersService.GetRoomsOfUser(_session.CurrentUser);
 
             Console.WriteLine();
 
-            foreach (Room room in roomUsers)
+            foreach (Room room in rooms)
             {
                 Console.WriteLine(room.RoomName);
+            }
+
+            Console.WriteLine();
+
+            Console.Write("Enter room: ");
+            string roomName = Console.ReadLine();
+
+            if (rooms.Any(room => room.RoomName == roomName))
+            {
+                OpenRoom(rooms.Where(room => room.RoomName == roomName).FirstOrDefault());
+            }
+        }
+
+        private void OpenRoom(Room room)
+        {
+            Console.WriteLine();
+
+            foreach(User user in _roomUsersService.GetUsersOfRoom(room))
+            {
+                Console.WriteLine(user.Nickname);
             }
 
             Console.WriteLine();
