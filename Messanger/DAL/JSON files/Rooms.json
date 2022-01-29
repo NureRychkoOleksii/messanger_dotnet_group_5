@@ -1,2 +1,1 @@
-{
-}
+[{"Roles":{"0":{"RoleName":"Admin","Permissions":null},"1":{"RoleName":"User","Permissions":null}},"RoomName":"newroom","Id":1},{"Roles":{"0":{"RoleName":"Admin","Permissions":null},"1":{"RoleName":"User","Permissions":null}},"RoomName":"another new room","Id":2},{"Roles":{"0":{"RoleName":"Admin","Permissions":null},"1":{"RoleName":"User","Permissions":null}},"RoomName":"AnotherRoomKek","Id":3}]

@@ -6,5 +6,7 @@ namespace Core.Models
     {
         public int RoomId { get; set; }
         public int UserId { get; set; }
+        
+        public int UserRole { get; set; }
     }
 }
