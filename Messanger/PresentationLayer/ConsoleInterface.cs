@@ -71,6 +71,7 @@ namespace Messanger
                     OpenViewUserRooms();
                     break;
                 case "view users":
+                    OpenViewUsersPage();
                     break;
                 case "enter room":
                     OpenEnterRoomPage();
@@ -87,7 +88,6 @@ namespace Messanger
                 case "view roles":
                     OpenViewRolesPage();
                     break;
-                
                 case "invite user":
                     OpenInvitationPage();
                     break;
@@ -95,7 +95,9 @@ namespace Messanger
                 case "my invitations":
                     OpenMyInvitationsPage();
                     break;
-
+                case "update room name":
+                    OpenUpdateRoomNamePage();
+                    break;
                 default:
                     Console.WriteLine($"No such page {action}");
                     break;
@@ -442,11 +444,17 @@ namespace Messanger
 
             bool hasEnteted = _session.EnterRoom(_roomService.GetRoom(roomName));
 
+            // update room name
+            // delete room
+            // remove users
+            // leave room
+
             if (hasEnteted)
             {
                 Console.WriteLine($"Welcome to the room {_session.CurrentRoom.RoomName}!");
                 pageContent = string.Concat(
                     "\nGo to:\n\n",
+                    "view users\n",
                     "exit room\n",
                     "invite user\n",
                     "create role\n",
@@ -515,6 +523,7 @@ namespace Messanger
             Role userRole = _roomUsersService.GetUserRole(_session.CurrentUser, _session.CurrentRoom, out int roleId);
             string pageContent = string.Concat(
                 "\nGo to:\n\n",
+                "view users\n",
                 "exit room\n",
                 "create role\n",
                 "delete tole\n",
@@ -555,6 +564,7 @@ namespace Messanger
             Role userRole = _roomUsersService.GetUserRole(_session.CurrentUser, _session.CurrentRoom, out int roleId);
             string pageContent = string.Concat(
                     "\nGo to:\n\n",
+                    "view users\n",
                     "exit room\n",
                     "create role\n",
                     "delete tole\n",
@@ -595,6 +605,7 @@ namespace Messanger
             IEnumerable<Role> roles = _roomService.GetAllRoles(_session.CurrentRoom);
             string pageContent = string.Concat(
                 "\nGo to:\n\n",
+                "view users\n",
                 "exit room\n",
                 "create role\n",
                 "delete tole\n",
@@ -609,5 +620,91 @@ namespace Messanger
             
             Console.WriteLine(pageContent);
         }
+
+        private void OpenViewUsersPage()
+        {
+            if (!_session.IsUserLoggedIn)
+            {
+                Console.WriteLine("\nError: not logged in\n\n");
+                return;
+            }
+
+            string pageContent = string.Empty;
+
+            if (_session.CurrentRoom != null)
+            {
+                var users = _roomUsersService.GetUsersOfRoom(_session.CurrentRoom);
+
+                Console.WriteLine();
+                foreach(User user in users)
+                {
+                    Console.WriteLine(user.Nickname);
+                }
+                Console.WriteLine();
+
+                pageContent = string.Concat(
+                   "\nGo to:\n\n",
+                   "view users\n",
+                   "exit room\n",
+                   "create role\n",
+                   "delete tole\n",
+                   "view roles\n"
+                );
+            }
+            else
+            {
+                Console.WriteLine("\nError: enter a room first");
+
+                pageContent = string.Concat(
+                    $"\nHello, {_session.CurrentUser.Nickname}!\n",
+                    "\nGo to:\n\n",
+                    "enter room\n",
+                    "view rooms\n",
+                    "create room\n",
+                    "logout\n",
+                    "exit\n"
+                );
+            }
+
+            Console.WriteLine(pageContent);
+        }
+
+        private void OpenUpdateRoomNamePage()
+        {
+            if (!_session.IsUserLoggedIn)
+            {
+                Console.WriteLine("\nError: not logged in\n\n");
+                return;
+            }
+
+            if (_session.CurrentRoom != null)
+            {
+                if (_roomUsersService.GetUserRole(_session.CurrentUser, _session.CurrentRoom).RoleName == "Admin")
+                {
+                    Console.Write("Enter new room name: ");
+                    string name = Console.ReadLine();
+
+                    while (_roomService.RoomExists(name))
+                    {
+                        Console.WriteLine($"Room {name} already exists");
+                        Console.Write("Enter new room name: ");
+                        name = Console.ReadLine();
+                    }
+
+                    Room room = _session.CurrentRoom;
+                    room.RoomName = name;
+                    _roomService.UpdateRoom(room);
+                    _session.ExitRoom();
+                }
+                else
+                {
+                    Console.WriteLine("\nError: permission denied");
+                }
+            }
+            else
+            {
+                Console.WriteLine("\nError: enter a room first");
+            }
+        } 
     }
 }

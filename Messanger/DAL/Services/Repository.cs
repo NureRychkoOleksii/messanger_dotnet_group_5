@@ -44,7 +44,7 @@ namespace DAL.Services
         {
             int id = obj.Id;
             await DeleteObjectAsync(obj);
-            await CreateObjectAsync(obj);
+            await CreateObjectSameIdAsync(obj);
         }
 
         public async Task DeleteObjectAsync(T obj)
@@ -80,6 +80,14 @@ namespace DAL.Services
             }
 
             return x;
+        }
+
+        private async Task CreateObjectSameIdAsync(T obj)
+        {
+            var str = this.GetName(typeof(T));
+            data = (await GetAllAsync(typeof(T))).ToList();
+            data.Add(obj);
+            await _serializationWorker.Serialize<List<T>>(data, str);
         }
     }
 }
