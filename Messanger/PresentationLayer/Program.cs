@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,8 @@ namespace Messanger
             services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
 
             services.AddScoped<App>();
+
+            services.AddScoped<ConsoleInterface>();
             
             BLL.DependencyRegistrar.ConfigureServices(services);
         }
