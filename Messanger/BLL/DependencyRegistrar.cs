@@ -1,5 +1,6 @@
 ﻿using BLL.Abstractions.Interfaces;
 using BLL.Services;
+using Core.Models;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BLL
@@ -13,6 +14,7 @@ namespace BLL
             services.AddScoped<IRoomUsersService, RoomUsersService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IUsersInvitationService, UserInvitationService>();
+            services.AddScoped<IChatService, ChatService>();
             services.AddScoped<Session>();
             DAL.DependencyRegistrar.ConfigureServices(services);
         }

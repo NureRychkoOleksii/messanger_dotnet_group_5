@@ -77,6 +77,9 @@ namespace DAL.Services
                 case "UsersInvitation":
                     x = "..\\..\\..\\..\\DAL\\JSON files\\UsersInvitation.json";
                     break;
+                case "Chat":
+                    x = "..\\..\\..\\..\\DAL\\JSON files\\Chats.json";
+                    break;
             }
 
             return x;

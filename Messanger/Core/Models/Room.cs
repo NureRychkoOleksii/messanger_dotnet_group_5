@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Core.Models;
 
 namespace Core
@@ -19,6 +20,8 @@ namespace Core
             },
             [1] = new Role() {RoleName = "User"}
         };
+
+        public List<Chat> Chats = new List<Chat>();
 
         // public List<Role> Roles { get; set; }
         //
