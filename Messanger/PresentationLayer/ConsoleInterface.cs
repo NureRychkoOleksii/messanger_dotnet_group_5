@@ -323,13 +323,13 @@ namespace Messanger
 
                 User user = new User {Nickname = username, Password = password, Email = email};
                 _userService.CreateUser(user);
-                _emailService.SendingEmailOnRegistration(user);
                 _session.TryLogin(user.Nickname, user.Password);
 
                 // create register class
 
                 if (_session.IsUserLoggedIn)
                 {
+                    _emailService.SendingEmailOnRegistration(user);
                     Console.WriteLine("Successfully logged in!\n");
                     pageContent = string.Concat(
                         "Go to:\n\n",
@@ -386,6 +386,13 @@ namespace Messanger
                 roomName = Console.ReadLine().Trim();
             }
 
+            while (String.IsNullOrEmpty(roomName))
+            {
+                Console.WriteLine("Room name can not be empty.");
+                Console.Write("Enter room name: ");
+                roomName = Console.ReadLine().Trim();
+            }
+            
             Room roomToCreate = new Room {RoomName = roomName};
             _roomService.CreateRoom(roomToCreate);
             
@@ -560,6 +567,14 @@ namespace Messanger
             {
                 Console.Write("Enter the name of the new role: ");
                 string newRoleName = Console.ReadLine().Trim();
+                
+                while (String.IsNullOrEmpty(newRoleName))
+                {
+                    Console.WriteLine("Role name can not be empty.");
+                    Console.Write("Enter the name of the new role: ");
+                    newRoleName = Console.ReadLine().Trim();
+                }
+                
                 bool hasCreatedRole = _roomService.CreateRole(newRoleName, _session.CurrentRoom);
 
                 if (hasCreatedRole)
@@ -814,8 +829,15 @@ namespace Messanger
                 
                 Console.Write("Enter the name of the new chat: ");
                 string newChatName = Console.ReadLine().Trim();
+
+                while (String.IsNullOrEmpty(newChatName))
+                {
+                    Console.WriteLine("Chat name can not be empty.");
+                    Console.Write("Enter the name of the new chat: ");
+                    newChatName = Console.ReadLine().Trim();
+                }
                 
-                Console.Write("Is the room private? (yes / no): ");
+                Console.Write("Is the chat private? (yes / no): ");
                 string isPrivate = Console.ReadLine().Trim().ToLower();
                 
                 while (!isPrivate.Equals("yes") && !isPrivate.Equals("no"))
