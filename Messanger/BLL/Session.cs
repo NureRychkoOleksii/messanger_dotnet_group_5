@@ -9,22 +9,29 @@ namespace BLL
     public class Session
     {
         private readonly IUserService _userService;
+        private readonly IRoomService _roomService;
         private readonly IRoomUsersService _roomUsersService;
+        private readonly IChatService _chatService;
 
         private bool _isUserLoggedIn = false;
         private User _currentUser;
         private Room _currentRoom;
+        private Chat _currentChat;
 
-        public Session(IUserService userService, IRoomUsersService roomUsersService)
+        public Session(IUserService userService, IRoomUsersService roomUsersService, IRoomService roomService,
+            IChatService chatService)
         {
             _userService = userService;
+            _roomService = roomService;
             _roomUsersService = roomUsersService;
+            _chatService = chatService;
         }
 
         public bool IsUserLoggedIn => _isUserLoggedIn;
         public User CurrentUser => _currentUser;
-
         public Room CurrentRoom => _currentRoom;
+        public Chat CurrentChat => _currentChat;
+        
 
         public bool TryLogin(string username, string password)
         {
@@ -82,5 +89,41 @@ namespace BLL
                 return false;
             }
         }
+
+        public bool EnterChat(Chat chatToEnter)
+        {
+            if (chatToEnter == null)
+            {
+                return false;
+            }
+
+            var chats = _chatService.GetChats(_currentRoom)
+                .Where(chat => chat.Name == chatToEnter.Name)
+                .FirstOrDefault();
+
+            if (chats != null)
+            {
+                _currentChat = chatToEnter;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool ExitChat()
+        {
+            if (_currentChat != null)
+            {
+                _currentChat = null;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        
     }
 }

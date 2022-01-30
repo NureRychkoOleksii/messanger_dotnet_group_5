@@ -4,6 +4,8 @@
     {
         public string Name { get; set; }
         
+        public int RoomId { get; set; }
+        
         public RoomUsers RoomUsers { get; set; }
         
         public bool IsPrivate { get; set; }

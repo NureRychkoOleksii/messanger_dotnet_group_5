@@ -9,7 +9,7 @@ namespace BLL.Services
     public class RoomService : IRoomService
     {
         private readonly IRepository<Room> _repository;
-
+        
         public RoomService(IRepository<Room> repository)
         {
             _repository = repository;
