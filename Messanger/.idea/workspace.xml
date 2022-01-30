@@ -2,17 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d586870b-fa5f-4c1c-98bc-addcd014ac73" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BLL/DependencyRegistrar.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BLL/DependencyRegistrar.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BLL/Services/RoomService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BLL/Services/RoomService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BLL/Session.cs" beforeDir="false" afterPath="$PROJECT_DIR$/BLL/Session.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Models/Chat.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Models/Chat.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core/Models/Room.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Core/Models/Room.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DAL/JSON files/RoomUsers.json" beforeDir="false" afterPath="$PROJECT_DIR$/DAL/JSON files/RoomUsers.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DAL/JSON files/Chats.json" beforeDir="false" afterPath="$PROJECT_DIR$/DAL/JSON files/Chats.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DAL/JSON files/Rooms.json" beforeDir="false" afterPath="$PROJECT_DIR$/DAL/JSON files/Rooms.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DAL/Services/Repository.cs" beforeDir="false" afterPath="$PROJECT_DIR$/DAL/Services/Repository.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DAL/JSON files/Users.json" beforeDir="false" afterPath="$PROJECT_DIR$/DAL/JSON files/Users.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PresentationLayer/ConsoleInterface.cs" beforeDir="false" afterPath="$PROJECT_DIR$/PresentationLayer/ConsoleInterface.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PresentationLayer/appsettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/PresentationLayer/appsettings.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,7 +36,7 @@
       <option name="presentableId" value="Default" />
       <updated>1643390898830</updated>
       <workItem from="1643390900930" duration="6321000" />
-      <workItem from="1643489633306" duration="2902000" />
+      <workItem from="1643489633306" duration="3586000" />
     </task>
     <servers />
   </component>

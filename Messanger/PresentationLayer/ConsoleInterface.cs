@@ -416,6 +416,16 @@ namespace Messanger
 
         private void OpenViewUserRooms()
         {
+            string pageContent = String.Concat($"\nHello, {_session.CurrentUser.Nickname}!\n",
+            "\nGo to:\n\n",
+            "enter room\n",
+            "view rooms\n",
+            "create room\n",
+            "invite user\n",
+            "logout\n",
+            "exit\n"
+            );
+            
             if (!_session.IsUserLoggedIn)
             {
                 Console.WriteLine("\nError: not logged in\n\n");
@@ -425,13 +435,19 @@ namespace Messanger
             var roomUsers = _roomUsersService.GetRoomsOfUser(_session.CurrentUser);
 
             Console.WriteLine();
-
-            foreach (Room room in roomUsers)
+            if (roomUsers.Count() > 0)
             {
-                Console.WriteLine(room.RoomName);
+                foreach (Room room in roomUsers)
+                {
+                    Console.WriteLine(room.RoomName);
+                }
+            }
+            else
+            {
+                Console.WriteLine("You have no rooms.");
             }
 
-            Console.WriteLine();
+            Console.WriteLine(pageContent);
         }
 
         private void OpenEnterRoomPage()
@@ -457,13 +473,16 @@ namespace Messanger
             {
                 Console.WriteLine($"Welcome to the room {_session.CurrentRoom.RoomName}!");
                 pageContent = string.Concat(
+                    $"\nHello, {_session.CurrentUser.Nickname}!\n",
                     "\nGo to:\n\n",
                     "view users\n",
                     "exit room\n",
-                    "invite user\n",
                     "create role\n",
-                    "delete role\n",
-                    "view roles\n"
+                    "delete tole\n",
+                    "view roles\n",
+                    "create chat\n",
+                    "view chats\n",
+                    "enter chat\n"
                 );
             }
             else
@@ -531,7 +550,10 @@ namespace Messanger
                 "exit room\n",
                 "create role\n",
                 "delete tole\n",
-                "view roles\n"
+                "view roles\n",
+                "create chat\n",
+                "view chats\n",
+                "enter chat\n"
             );
             
             if (_session.CurrentRoom.Roles[roleId].Permissions["Manage roles"])
@@ -567,13 +589,16 @@ namespace Messanger
 
             Role userRole = _roomUsersService.GetUserRole(_session.CurrentUser, _session.CurrentRoom, out int roleId);
             string pageContent = string.Concat(
-                    "\nGo to:\n\n",
-                    "view users\n",
-                    "exit room\n",
-                    "create role\n",
-                    "delete tole\n",
-                    "view roles\n"
-                    );
+                "\nGo to:\n\n",
+                "view users\n",
+                "exit room\n",
+                "create role\n",
+                "delete tole\n",
+                "view roles\n",
+                "create chat\n",
+                "view chats\n",
+                "enter chat\n"
+                );
 
             if (_session.CurrentRoom.Roles[roleId].Permissions["Manage roles"])
             {
@@ -613,7 +638,10 @@ namespace Messanger
                 "exit room\n",
                 "create role\n",
                 "delete tole\n",
-                "view roles\n"
+                "view roles\n",
+                "create chat\n",
+                "view chats\n",
+                "enter chat\n"
             );
             
             Console.WriteLine();
@@ -647,12 +675,15 @@ namespace Messanger
                 Console.WriteLine();
 
                 pageContent = string.Concat(
-                   "\nGo to:\n\n",
-                   "view users\n",
-                   "exit room\n",
-                   "create role\n",
-                   "delete tole\n",
-                   "view roles\n"
+                    "\nGo to:\n\n",
+                    "view users\n",
+                    "exit room\n",
+                    "create role\n",
+                    "delete tole\n",
+                    "view roles\n",
+                    "create chat\n",
+                    "view chats\n",
+                    "enter chat\n"
                 );
             }
             else
@@ -734,15 +765,22 @@ namespace Messanger
             if (_session.CurrentRoom != null)
             {
                 var chats = _chatService.GetChats(_session.CurrentRoom);
-                
-                Console.WriteLine();
 
-                foreach (Chat chat in chats)
+                if (chats.Count() > 0)
                 {
-                    Console.WriteLine(chat.Name);
+                    Console.WriteLine();
+
+                    foreach (Chat chat in chats)
+                    {
+                        Console.WriteLine(chat.Name);
+                    }
+
+                    Console.WriteLine();
                 }
-                
-                Console.WriteLine();
+                else
+                {
+                    Console.WriteLine("\nYou have no chats.");
+                }
             }
             else
             {
@@ -859,11 +897,14 @@ namespace Messanger
                 pageContent = string.Concat(
                     $"\nHello, {_session.CurrentUser.Nickname}!\n",
                     "\nGo to:\n\n",
-                    "enter room\n",
-                    "view rooms\n",
-                    "create room\n",
-                    "logout\n",
-                    "exit\n"
+                    "view users\n",
+                    "exit room\n",
+                    "create role\n",
+                    "delete tole\n",
+                    "view roles\n",
+                    "create chat\n",
+                    "view chats\n",
+                    "enter chat\n"
                 );
             }
             Console.WriteLine(pageContent);
