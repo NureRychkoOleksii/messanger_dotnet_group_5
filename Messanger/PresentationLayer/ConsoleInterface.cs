@@ -143,7 +143,7 @@ namespace Messanger
                     var roomUsers = new RoomUsers()
                         {RoomId = isUserInvited.RoomId, UserId = isUserInvited.UserId, UserRole = 1};
                     _roomUsersService.CreateRoomUsers(roomUsers);
-                    _usersInvitationService.RemoveUser(isUserInvited.Id,_session.CurrentRoom.Id);
+                   // _usersInvitationService.RemoveUser(isUserInvited.Id,_session.CurrentRoom.Id);
                 }
                 else
                 {
@@ -303,8 +303,8 @@ namespace Messanger
                 string email = Console.ReadLine().Trim();
 
                 string pageContent;
-
-                Console.Write("Password: ");
+                
+                Console.Write("Password(any letters, 8-24 length, symbols(!#$%&): ");
                 string password = Console.ReadLine().Trim();
 
                 // check if password is good enough
@@ -440,6 +440,7 @@ namespace Messanger
             }
 
             var roomUsers = _roomUsersService.GetRoomsOfUser(_session.CurrentUser);
+            Thread.Sleep(500);
 
             Console.WriteLine();
             if (roomUsers.Count() > 0)
@@ -487,8 +488,10 @@ namespace Messanger
                     "create role\n",
                     "delete tole\n",
                     "view roles\n",
+                    "invite user\n",
                     "create chat\n",
                     "view chats\n",
+                    "update room name\n",
                     "enter chat\n"
                 );
             }
