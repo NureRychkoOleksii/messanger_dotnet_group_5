@@ -120,7 +120,7 @@ namespace Messanger
             }
         }
 
-        private void OpenMyInvitationsPage()
+        private async void OpenMyInvitationsPage()
         {
             if (!_session.IsUserLoggedIn)
             {
@@ -128,11 +128,13 @@ namespace Messanger
                 return;
             }
             
-            var usersInvitations = _usersInvitationService.GetUsers().ToList();
+            var usersInvitationsAsync = await _usersInvitationService.GetUsers();
+            var usersInvitations = usersInvitationsAsync.ToList();
 
             var isUserInvited = usersInvitations.Where(user => _session.CurrentUser.Id == user.UserId).FirstOrDefault();
 
-            var roomName = _roomService.GetRooms().ToList().Where(room => room.Id == isUserInvited.RoomId).FirstOrDefault().RoomName;
+            var rooms = await _roomService.GetRooms();
+            var roomName = rooms.ToList().Where(room => room.Id == isUserInvited.RoomId).FirstOrDefault().RoomName;
 
             if (isUserInvited != null)
             {
@@ -157,7 +159,7 @@ namespace Messanger
             }
         }
         
-        private void OpenInvitationPage()
+        private async void OpenInvitationPage()
         {
             if (!_session.IsUserLoggedIn)
             {
@@ -168,14 +170,13 @@ namespace Messanger
             Console.WriteLine("Enter a nickname of user or 'exit'");
 
             string user = Console.ReadLine();
-
-            User userToInvite = null;
-            userToInvite = _userService.GetUser(user);
+            
+            var userToInvite = await _userService.GetUser(userUser => userUser.Nickname == user);
 
             Thread.Sleep(1000);
             // var userToInvite = _userService.GetUser(user);
 
-            if (userToInvite != null)
+            if (userToInvite is not null)
             {
                 _usersInvitationService.AddUser(userToInvite.Id, _session.CurrentRoom.Id);
                 _emailService.SendingEmailOnInviting(userToInvite,_session.CurrentRoom.RoomName);
@@ -251,7 +252,7 @@ namespace Messanger
             Console.WriteLine(pageContent);
         }
 
-        private void OpenLoginPage()
+        private async void OpenLoginPage()
         {
             while (!_session.IsUserLoggedIn)
             {
@@ -261,7 +262,7 @@ namespace Messanger
                 Console.Write("Password: ");
                 string password = Console.ReadLine().Trim();
 
-                if (_session.TryLogin(username, password))
+                if (await _session.TryLogin(username, password))
                 {
                     string pageContent = string.Concat(
                         "\nGo to:\n\n",
@@ -279,14 +280,14 @@ namespace Messanger
             }
         }
 
-        private void OpenRegisterPage()
+        private async void OpenRegisterPage()
         {
             if (!_session.IsUserLoggedIn)
             {
                 Console.Write("Username: ");
                 string username = Console.ReadLine().Trim();
 
-                while (_userService.UserExists(username))
+                while (await _userService.UserExists(x => x.Nickname == username))
                 {
                     Console.WriteLine($"Name {username} is already taken");
                     Console.Write("Username: ");
@@ -367,7 +368,7 @@ namespace Messanger
             Console.WriteLine(pageContent);
         }
 
-        private void OpenCreateRoomPage()
+        private async void OpenCreateRoomPage()
         {
             if (!_session.IsUserLoggedIn)
             {
@@ -379,7 +380,9 @@ namespace Messanger
             Console.Write("Enter room name: ");
             string roomName = Console.ReadLine().Trim();
 
-            while (_roomService.RoomExists(roomName))
+            var condition = await _roomService.RoomExists(roomName);
+
+            while (condition)
             {
                 Console.WriteLine($"Room {roomName} already exists");
                 Console.Write("Enter room name: ");
@@ -407,7 +410,7 @@ namespace Messanger
 
             while (room == null)
             {
-                room = _roomService.GetRoom(roomName);
+                room = await _roomService.GetRoom(x => x.RoomName == roomName);
             }
 
             
@@ -421,7 +424,7 @@ namespace Messanger
             OpenMainPage();
         }
 
-        private void OpenViewUserRooms()
+        private async void OpenViewUserRooms()
         {
             string pageContent = String.Concat($"\nHello, {_session.CurrentUser.Nickname}!\n",
             "\nGo to:\n\n",
@@ -439,7 +442,8 @@ namespace Messanger
                 return;
             }
 
-            var roomUsers = _roomUsersService.GetRoomsOfUser(_session.CurrentUser);
+            var roomUsers = await _roomUsersService.GetRoomsOfUser(_session.CurrentUser);
+            
             Thread.Sleep(500);
 
             Console.WriteLine();
@@ -458,7 +462,7 @@ namespace Messanger
             Console.WriteLine(pageContent);
         }
 
-        private void OpenEnterRoomPage()
+        private async void OpenEnterRoomPage()
         {
             if (!_session.IsUserLoggedIn)
             {
@@ -470,7 +474,9 @@ namespace Messanger
             Console.Write("Enter the name of the room: ");
             string roomName = Console.ReadLine().Trim();
 
-            bool hasEnteted = _session.EnterRoom(_roomService.GetRoom(roomName));
+            var room = await _roomService.GetRoom(x => x.RoomName == roomName);
+
+            bool hasEnteted = await _session.EnterRoom(room);
 
             // update room name
             // delete room
@@ -671,7 +677,7 @@ namespace Messanger
             Console.WriteLine(pageContent);
         }
 
-        private void OpenViewUsersPage()
+        private async void OpenViewUsersPage()
         {
             if (!_session.IsUserLoggedIn)
             {
@@ -683,7 +689,7 @@ namespace Messanger
 
             if (_session.CurrentRoom != null)
             {
-                var users = _roomUsersService.GetUsersOfRoom(_session.CurrentRoom);
+                var users = await _roomUsersService.GetUsersOfRoom(_session.CurrentRoom);
 
                 Console.WriteLine();
                 foreach(User user in users)
@@ -722,7 +728,7 @@ namespace Messanger
             Console.WriteLine(pageContent);
         }
 
-        private void OpenUpdateRoomNamePage()
+        private async void OpenUpdateRoomNamePage()
         {
             if (!_session.IsUserLoggedIn)
             {
@@ -732,12 +738,13 @@ namespace Messanger
 
             if (_session.CurrentRoom != null)
             {
-                if (_roomUsersService.GetUserRole(_session.CurrentUser, _session.CurrentRoom).RoleName == "Admin")
+                var userRole = await _roomUsersService.GetUserRole(_session.CurrentUser, _session.CurrentRoom);
+                if (userRole.RoleName == "Admin")
                 {
                     Console.Write("Enter new room name: ");
                     string name = Console.ReadLine().Trim();
 
-                    while (_roomService.RoomExists(name))
+                    while (await _roomService.RoomExists(name))
                     {
                         Console.WriteLine($"Room {name} already exists");
                         Console.Write("Enter new room name: ");

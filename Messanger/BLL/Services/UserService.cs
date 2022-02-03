@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using BLL.Abstractions.Interfaces;
 using Core;
 using DAL.Abstractions.Interfaces;
@@ -18,56 +19,66 @@ namespace BLL.Services
             _repository = repository;
         }
 
-        public void CreateUser(User user)
+        public async void CreateUser(User user)
         {
-            if (CheckRegisterData(user.Nickname, user.Password, user.Email))
+            var condition = await CheckRegisterData(user.Nickname, user.Password, user.Email);
+            
+            if (condition)
             {
-                _repository.CreateObjectAsync(user);
+                await _repository.CreateObjectAsync(user);
             }
         }
 
-        public void DeleteUser(User user)
+        public async void DeleteUser(User user)
         {
-            _repository.DeleteObjectAsync(user);
+            await _repository.DeleteObjectAsync(user);
         }
 
-        public void UpdateUser(User user)
+        public async void UpdateUser(User user)
         {
-            _repository.UpdateObjectAsync(user);
+            await _repository.UpdateObjectAsync(user);
         }
 
-        public IEnumerable<User> GetUsers()
+        public async Task<IEnumerable<User>> GetUsers()
         {
-           return _repository.GetAllAsync(typeof(User)).Result;
+            var users = await _repository.GetAllAsync(typeof(User));
+
+            return users;
+        }
+
+        public async Task<User> GetUser(Func<User,bool> func)
+        {
+           var users =  await _repository.GetAllAsync(typeof(User));
+               
+           return users.Where(func).FirstOrDefault();
         }
         
-        public User GetUser(string username)
+        // public User GetUser(string username)
+        // {
+        //     return _repository
+        //         .GetAllAsync(typeof(User))
+        //         .Result.Where(user => user.Nickname == username)
+        //         .FirstOrDefault();
+        // }
+        //
+        // public User GetUser(int id)
+        // {
+        //     return _repository
+        //         .GetAllAsync(typeof(User))
+        //         .Result.Where(user => user.Id == id)
+        //         .FirstOrDefault();
+        // }
+        // 
+        public async Task<bool> UserExists(Func<User, bool> func)
         {
-            return _repository
-                .GetAllAsync(typeof(User))
-                .Result.Where(user => user.Nickname == username)
-                .FirstOrDefault();
-        }
-
-        public User GetUser(int id)
-        {
-            return _repository
-                .GetAllAsync(typeof(User))
-                .Result.Where(user => user.Id == id)
-                .FirstOrDefault();
-        }
-
-        public bool UserExists(string username)
-        {
-            return _repository
-                .GetAllAsync(typeof(User))
-                .Result.Where(user => user.Nickname == username)
-                .FirstOrDefault() != null;
+            var user =  await _repository.GetAllAsync(typeof(User));
+            
+            return user.Where(func).FirstOrDefault() != null;
         }
         
-        public bool CheckRegisterData (string nickname, string password, string email)
+        private async Task<bool> CheckRegisterData (string nickname, string password, string email)
         {
-            var users = this.GetUsers();
+            var users = await this.GetUsers();
             var userName = users.Where(user => user.Nickname == nickname).FirstOrDefault();
             string checkPassword = new string(@"^[a-zA-Z0-9!#$%&]{8,24}$");
             string checkEmail = new string( @"^[^@\s]+@[^@\s]+\.[^@\s]+$");

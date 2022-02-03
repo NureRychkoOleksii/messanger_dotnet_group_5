@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BLL.Abstractions.Interfaces;
 using Core;
 using Core.Models;
@@ -35,9 +36,11 @@ namespace BLL.Services
             _repository.UpdateObjectAsync(roomUsers);
         }
 
-        public IEnumerable<RoomUsers> GetRoomUsers()
+        public async Task<IEnumerable<RoomUsers>> GetRoomUsers()
         {
-            return _repository.GetAllAsync(typeof(RoomUsers)).Result;
+            var rooms = await _repository.GetAllAsync(typeof(RoomUsers));
+
+            return rooms;
         }
 
         public IEnumerable<RoomUsers> GetRoomUsersOfUser(User user)
@@ -70,15 +73,14 @@ namespace BLL.Services
         //     return role.RoleName;
         // }
 
-        public Role GetUserRole(User user, Room room)
+        public async Task<Role> GetUserRole(User user, Room room)
         {
-            RoomUsers roomUser = _repository
-                .GetAllAsync(typeof(RoomUsers))
-                .Result.Where(roomUser => roomUser.UserId == user.Id
-                                          && roomUser.RoomId == room.Id)
+            var roomUserAsync = await _repository
+                .GetAllAsync(typeof(RoomUsers));
+            var roomUser = roomUserAsync.Where(roomUser => roomUser.UserId == user.Id && roomUser.RoomId == room.Id)
                 .FirstOrDefault();
             
-            Role userRole = room.Roles
+            var userRole = room.Roles
                 .Where(role => role.Key == roomUser.UserRole)
                 .FirstOrDefault().Value;
 
@@ -104,7 +106,7 @@ namespace BLL.Services
         
 
         
-        public IEnumerable<Room> GetRoomsOfUser(User user)
+        public async Task<IEnumerable<Room>> GetRoomsOfUser(User user)
         {
             var roomUsers = _repository
                 .GetAllAsync(typeof(RoomUsers))
@@ -114,14 +116,15 @@ namespace BLL.Services
 
             foreach(RoomUsers roomUser in roomUsers)
             {
-                rooms.Add(_roomService.GetRoom(roomUser.RoomId));
+                var room = await _roomService.GetRoom(user => user.Id == roomUser.Id);
+                rooms.Add(room);
             }
             
             
             return rooms;
         }
 
-        public IEnumerable<User> GetUsersOfRoom(Room room)
+        public async Task<IEnumerable<User>> GetUsersOfRoom(Room room)
         {
             var roomUsers = _repository
                 .GetAllAsync(typeof(RoomUsers))
@@ -131,7 +134,8 @@ namespace BLL.Services
 
             foreach (RoomUsers roomUser in roomUsers)
             {
-                users.Add(_userService.GetUser(roomUser.UserId));
+                var userAsync = await _userService.GetUser(user => user.Id == roomUser.Id);
+                users.Add(userAsync);
             }
 
             return users;

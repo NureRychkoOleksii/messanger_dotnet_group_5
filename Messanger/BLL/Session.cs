@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Core;
 using Core.Models;
 using BLL.Abstractions.Interfaces;
@@ -33,9 +34,9 @@ namespace BLL
         public Chat CurrentChat => _currentChat;
         
 
-        public bool TryLogin(string username, string password)
+        public async Task<bool> TryLogin(string username, string password)
         {
-            var users = _userService.GetUsers();
+            var users = await _userService.GetUsers();
             var user = users.Where(x => x.Nickname == username).FirstOrDefault();
 
             if (user != null && user.Password == password)
@@ -57,14 +58,14 @@ namespace BLL
             }
         }
 
-        public bool EnterRoom(Room room)
+        public async Task<bool> EnterRoom(Room room)
         {
             if (room == null)
             {
                 return false;
             }
-            var roomUsers = _roomUsersService.GetRoomsOfUser(_currentUser)
-                .Where(roomUser => roomUser.Id == room.Id)
+            var roomUsersAsync = await _roomUsersService.GetRoomsOfUser(_currentUser);
+            var roomUsers = roomUsersAsync.Where(roomUser => roomUser.Id == room.Id)
                 .FirstOrDefault();
             if (roomUsers != null)
             {

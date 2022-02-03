@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BLL.Abstractions.Interfaces;
 using Core;
 using Core.Models;
@@ -17,11 +18,11 @@ namespace BLL.Services
             _repository = repository;
         }
 
-        public void AddUser(int userId, int roomId)
+        public async void AddUser(int userId, int roomId)
         {
             var user = new UsersInvitation() {RoomId = roomId, UserId = userId, Id = 0};
             
-            _repository.CreateObjectAsync(user);
+            await _repository.CreateObjectAsync(user);
         }
 
         public void RemoveUser(int userId, int roomId)
@@ -31,9 +32,9 @@ namespace BLL.Services
             _repository.DeleteObjectAsync(user);
         }
 
-        public IEnumerable<UsersInvitation> GetUsers()
+        public async Task<IEnumerable<UsersInvitation>> GetUsers()
         {
-            return _repository.GetAllAsync(typeof(UsersInvitation)).Result;
+            return await _repository.GetAllAsync(typeof(UsersInvitation));
         }
     }
 }

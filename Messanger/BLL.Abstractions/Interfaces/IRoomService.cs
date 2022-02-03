@@ -1,18 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Core;
 
 namespace BLL.Abstractions.Interfaces
 {
     public interface IRoomService
     {
-        void CreateRoom(Room room);
+        public void CreateRoom(Room room);
         void DeleteRoom(Room room);
         void UpdateRoom(Room room);
-        IEnumerable<Room> GetRooms();
-        Room GetRoom(string name);
-        Room GetRoom(int id);
-        bool RoomExists(string name);
+        public Task<IEnumerable<Room>> GetRooms();
+        public Task<Room> GetRoom(Func<Room, bool> func);
+        public Task<bool> RoomExists(string name);
         bool CreateRole(string roleName, Room room);
+        // Task<Room> GetRoom(string roomName);
         bool DeleteRole(string roleName, Room room);
         IEnumerable<Role> GetAllRoles(Room room);
 

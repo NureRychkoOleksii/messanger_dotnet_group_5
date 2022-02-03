@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Core;
 
 namespace BLL.Abstractions.Interfaces
@@ -8,9 +10,11 @@ namespace BLL.Abstractions.Interfaces
         void CreateUser(User user);
         void DeleteUser(User user);
         void UpdateUser(User user);
-        IEnumerable<User> GetUsers();
-        User GetUser(string username);
-        User GetUser(int id);
-        bool UserExists(string username);
+
+        public Task<IEnumerable<User>> GetUsers();
+        // User GetUser(string username);
+        // User GetUser(int id);
+        public Task<bool> UserExists(Func<User, bool> func);
+        public Task<User> GetUser(Func<User, bool> func);
     }
 }

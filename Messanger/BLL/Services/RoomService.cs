@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BLL.Abstractions.Interfaces;
 using Core;
 using DAL.Abstractions.Interfaces;
@@ -15,48 +17,57 @@ namespace BLL.Services
             _repository = repository;
         }
         
-        public void CreateRoom(Room room)
+        public async void CreateRoom(Room room)
         {
-            _repository.CreateObjectAsync(room);
+            await _repository.CreateObjectAsync(room);
         }
 
-        public void DeleteRoom(Room room)
+        public async void DeleteRoom(Room room)
         {
-            _repository.DeleteObjectAsync(room);
+            await _repository.DeleteObjectAsync(room);
         }
 
-        public void UpdateRoom(Room room)
+        public async void UpdateRoom(Room room)
         {
-            _repository.UpdateObjectAsync(room);
+            await _repository.UpdateObjectAsync(room);
         }
 
-        public IEnumerable<Room> GetRooms()
+        public async Task<IEnumerable<Room>> GetRooms()
         {
-            return _repository.GetAllAsync(typeof(Room)).Result;
+            var rooms = await _repository.GetAllAsync(typeof(Room));
+
+            return rooms;
         }
 
-        public Room GetRoom(string name)
+        public async Task<Room> GetRoom(Func<Room, bool> func)
         {
-            return _repository
-                .GetAllAsync(typeof(Room))
-                .Result.Where(room => room.RoomName == name)
-                .FirstOrDefault();
+            var rooms = await _repository
+                .GetAllAsync(typeof(Room));
+                
+            return  rooms.Where(func).FirstOrDefault();
         }
 
-        public Room GetRoom(int id)
-        {
-            return _repository
-                .GetAllAsync(typeof(Room))
-                .Result.Where(room => room.Id == id)
-                .FirstOrDefault();
-        }
+        // public async Task<Room> GetRoom(string roomName)
+        // {
+        //     var rooms = await _repository.GetAllAsync(typeof(Room));
+        //
+        //     return rooms.Where(room => room.RoomName == roomName).FirstOrDefault();
+        // }
 
-        public bool RoomExists(string name)
+        // public Room GetRoom(int id)
+        // {
+        //     return _repository
+        //         .GetAllAsync(typeof(Room))
+        //         .Result.Where(room => room.Id == id)
+        //         .FirstOrDefault();
+        // }
+        //
+        public async Task<bool> RoomExists(string name)
         {
-            return _repository
-                .GetAllAsync(typeof(Room))
-                .Result.Where(room => room.RoomName == name)
-                .FirstOrDefault() != null;
+            var rooms = await _repository
+                .GetAllAsync(typeof(Room));
+                
+            return rooms.Where(room => room.RoomName == name).FirstOrDefault() != null;
         }
 
         public bool CreateRole(string roleName, Room room)
