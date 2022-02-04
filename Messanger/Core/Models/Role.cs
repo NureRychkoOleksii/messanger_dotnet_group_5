@@ -7,6 +7,8 @@ namespace Core
 {
     public class Role
     {
+        public int RoleId { get; set; }
+        
         public string RoleName;
 
         public Dictionary<string, bool> Permissions = new Dictionary<string, bool>()
