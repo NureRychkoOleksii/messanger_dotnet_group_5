@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Core;
 using DAL.DataBase;
-using Microsoft.EntityFrameworkCore.Storage;
 using System.Data.Entity;
 using DAL.Abstractions.Interfaces;
 
@@ -10,12 +9,17 @@ namespace DAL.Services;
 
 public class UnitOfWork : IDisposable, IUnitOfWork
 {
-    private DALContext _context = new DALContext();
+    private readonly DALContext _context;
     private DbContextTransaction _transaction;
     private GenericRepository<User> userRepository;
     private GenericRepository<Room> roomRepository;
     private bool _disposed = false;
 
+    public UnitOfWork(DALContext context)
+    {
+        this._context = context;
+    }
+    
     public GenericRepository<User> UserRepository
     {
         get
@@ -59,7 +63,7 @@ public class UnitOfWork : IDisposable, IUnitOfWork
         _transaction.Commit();
     }
     
-    public async Task Save()
+    public async Task SaveAsync()
     {
         await _context.SaveChangesAsync();
     }
