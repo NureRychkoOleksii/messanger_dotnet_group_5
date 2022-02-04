@@ -4,10 +4,11 @@ using Core;
 using DAL.DataBase;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Data.Entity;
+using DAL.Abstractions.Interfaces;
 
 namespace DAL.Services;
 
-public class UnitOfWork : IDisposable
+public class UnitOfWork : IDisposable, IUnitOfWork
 {
     private DALContext _context = new DALContext();
     private DbContextTransaction _transaction;
@@ -63,7 +64,7 @@ public class UnitOfWork : IDisposable
         await _context.SaveChangesAsync();
     }
 
-    protected async Task Dispose(bool disposing)
+    private async Task Dispose(bool disposing)
     {
         if (!this._disposed)
         {

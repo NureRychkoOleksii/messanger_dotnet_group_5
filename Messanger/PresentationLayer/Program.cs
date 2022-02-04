@@ -13,7 +13,7 @@ namespace Messanger
     {
         static async Task Main(string[] args)
         {
-            var unitOfWork = new UnitOfWork();
+            // var unitOfWork = new UnitOfWork();
 
             // await unitOfWork.UserRepository.Insert(new User()
             // {
