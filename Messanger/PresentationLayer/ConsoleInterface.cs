@@ -83,12 +83,12 @@ namespace Messanger
                 case "exit room":
                     OpenExitRoomPage();
                     break;
-                case "create role":
-                    OpenCreateRolePage();
-                    break;
-                case "delete role":
-                    OpenDeleteRolePage();
-                    break;
+                // case "create role":
+                //     OpenCreateRolePage();
+                //     break;
+                // case "delete role":
+                //     OpenDeleteRolePage();
+                //     break;
                 case "view roles":
                     OpenViewRolesPage();
                     break;
@@ -171,7 +171,9 @@ namespace Messanger
 
             string user = Console.ReadLine();
             
-            var userToInvite = await _userService.GetUser(userUser => userUser.Nickname == user);
+            var userToInviteAsync = await _userService.GetUser(userUser => userUser.Nickname == user);
+
+            var userToInvite = userToInviteAsync.FirstOrDefault();
 
             Thread.Sleep(1000);
             // var userToInvite = _userService.GetUser(user);
@@ -287,7 +289,9 @@ namespace Messanger
                 Console.Write("Username: ");
                 string username = Console.ReadLine().Trim();
 
-                while (await _userService.UserExists(x => x.Nickname == username))
+                var condition = await _userService.UserExists(x => x.Nickname == username);
+
+                while (condition)
                 {
                     Console.WriteLine($"Name {username} is already taken");
                     Console.Write("Username: ");
@@ -410,7 +414,8 @@ namespace Messanger
 
             while (room == null)
             {
-                room = await _roomService.GetRoom(x => x.RoomName == roomName);
+                var roomAsync = await _roomService.GetRoom(x => x.RoomName == roomName);
+                room = roomAsync.FirstOrDefault();
             }
 
             
@@ -476,7 +481,7 @@ namespace Messanger
 
             var room = await _roomService.GetRoom(x => x.RoomName == roomName);
 
-            bool hasEnteted = await _session.EnterRoom(room);
+            bool hasEnteted = await _session.EnterRoom(room.FirstOrDefault());
 
             // update room name
             // delete room
@@ -551,101 +556,101 @@ namespace Messanger
             Console.WriteLine(pageContent);
         }
 
-        public void OpenCreateRolePage()
-        {
-            if (!_session.IsUserLoggedIn)
-            {
-                Console.WriteLine("\nError: not logged in\n\n");
-                return;
-            }
+        // public async void OpenCreateRolePage()
+        // {
+        //     if (!_session.IsUserLoggedIn)
+        //     {
+        //         Console.WriteLine("\nError: not logged in\n\n");
+        //         return;
+        //     }
+        //
+        //     Role userRole = await _roomUsersService.GetUserRole(_session.CurrentUser, _session.CurrentRoom);
+        //     string pageContent = string.Concat(
+        //         "\nGo to:\n\n",
+        //         "view users\n",
+        //         "exit room\n",
+        //         "create role\n",
+        //         "delete tole\n",
+        //         "view roles\n",
+        //         "create chat\n",
+        //         "view chats\n",
+        //         "enter chat\n"
+        //     );
+        //     
+        //     if (_session.CurrentRoom.Roles[roleId].Permissions["Manage roles"])
+        //     {
+        //         Console.Write("Enter the name of the new role: ");
+        //         string newRoleName = Console.ReadLine().Trim();
+        //         
+        //         while (String.IsNullOrEmpty(newRoleName))
+        //         {
+        //             Console.WriteLine("Role name can not be empty.");
+        //             Console.Write("Enter the name of the new role: ");
+        //             newRoleName = Console.ReadLine().Trim();
+        //         }
+        //         
+        //         bool hasCreatedRole = _roomService.CreateRole(newRoleName, _session.CurrentRoom);
+        //
+        //         if (hasCreatedRole)
+        //         {
+        //             Console.WriteLine($"New role {newRoleName} was successfully created!\n");
+        //         }
+        //         else
+        //         {
+        //             Console.WriteLine($"Role {newRoleName} already exists.");
+        //         }
+        //     }
+        //     else
+        //     {
+        //         Console.WriteLine("You don't have permissions to create roles.");
+        //     }
+        //     
+        //     Console.WriteLine(pageContent);
+        // }
 
-            Role userRole = _roomUsersService.GetUserRole(_session.CurrentUser, _session.CurrentRoom, out int roleId);
-            string pageContent = string.Concat(
-                "\nGo to:\n\n",
-                "view users\n",
-                "exit room\n",
-                "create role\n",
-                "delete tole\n",
-                "view roles\n",
-                "create chat\n",
-                "view chats\n",
-                "enter chat\n"
-            );
-            
-            if (_session.CurrentRoom.Roles[roleId].Permissions["Manage roles"])
-            {
-                Console.Write("Enter the name of the new role: ");
-                string newRoleName = Console.ReadLine().Trim();
-                
-                while (String.IsNullOrEmpty(newRoleName))
-                {
-                    Console.WriteLine("Role name can not be empty.");
-                    Console.Write("Enter the name of the new role: ");
-                    newRoleName = Console.ReadLine().Trim();
-                }
-                
-                bool hasCreatedRole = _roomService.CreateRole(newRoleName, _session.CurrentRoom);
-
-                if (hasCreatedRole)
-                {
-                    Console.WriteLine($"New role {newRoleName} was successfully created!\n");
-                }
-                else
-                {
-                    Console.WriteLine($"Role {newRoleName} already exists.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("You don't have permissions to create roles.");
-            }
-            
-            Console.WriteLine(pageContent);
-        }
-
-        public void OpenDeleteRolePage()
-        {
-            if (!_session.IsUserLoggedIn)
-            {
-                Console.WriteLine("\nError: not logged in\n\n");
-                return;
-            }
-
-            Role userRole = _roomUsersService.GetUserRole(_session.CurrentUser, _session.CurrentRoom, out int roleId);
-            string pageContent = string.Concat(
-                "\nGo to:\n\n",
-                "view users\n",
-                "exit room\n",
-                "create role\n",
-                "delete tole\n",
-                "view roles\n",
-                "create chat\n",
-                "view chats\n",
-                "enter chat\n"
-                );
-
-            if (_session.CurrentRoom.Roles[roleId].Permissions["Manage roles"])
-            {
-                Console.Write("Enter the name of the role to delete: ");
-                string roleToDelete = Console.ReadLine().Trim();
-                bool hasDeletedRole = _roomService.DeleteRole(roleToDelete, _session.CurrentRoom);
-
-                if (hasDeletedRole)
-                {
-                    Console.WriteLine($"Role {roleToDelete} was successfully deleted!");
-                }
-                else
-                {
-                    Console.WriteLine($"No role {roleToDelete} exists.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("You don't have permissions to delete roles.");
-            }
-            
-            Console.WriteLine(pageContent);
-        }
+        // public void OpenDeleteRolePage()
+        // {
+        //     if (!_session.IsUserLoggedIn)
+        //     {
+        //         Console.WriteLine("\nError: not logged in\n\n");
+        //         return;
+        //     }
+        //
+        //     Role userRole = _roomUsersService.GetUserRole(_session.CurrentUser, _session.CurrentRoom, out int roleId);
+        //     string pageContent = string.Concat(
+        //         "\nGo to:\n\n",
+        //         "view users\n",
+        //         "exit room\n",
+        //         "create role\n",
+        //         "delete tole\n",
+        //         "view roles\n",
+        //         "create chat\n",
+        //         "view chats\n",
+        //         "enter chat\n"
+        //         );
+        //
+        //     if (_session.CurrentRoom.Roles[roleId].Permissions["Manage roles"])
+        //     {
+        //         Console.Write("Enter the name of the role to delete: ");
+        //         string roleToDelete = Console.ReadLine().Trim();
+        //         bool hasDeletedRole = _roomService.DeleteRole(roleToDelete, _session.CurrentRoom);
+        //
+        //         if (hasDeletedRole)
+        //         {
+        //             Console.WriteLine($"Role {roleToDelete} was successfully deleted!");
+        //         }
+        //         else
+        //         {
+        //             Console.WriteLine($"No role {roleToDelete} exists.");
+        //         }
+        //     }
+        //     else
+        //     {
+        //         Console.WriteLine("You don't have permissions to delete roles.");
+        //     }
+        //     
+        //     Console.WriteLine(pageContent);
+        // }
 
         public void OpenViewRolesPage()
         {
@@ -767,7 +772,7 @@ namespace Messanger
             }
         }
 
-        public void OpenViewChatsPage()
+        public async void OpenViewChatsPage()
         {
             string pageContent = string.Concat(
                 "\nGo to:\n\n",
@@ -789,7 +794,7 @@ namespace Messanger
 
             if (_session.CurrentRoom != null)
             {
-                var chats = _chatService.GetChats(_session.CurrentRoom);
+                var chats = await _chatService.GetChats(_session.CurrentRoom);
 
                 if (chats.Count() > 0)
                 {
@@ -815,7 +820,7 @@ namespace Messanger
             Console.WriteLine(pageContent);
         }
 
-        public void OpenCreateChatPage()
+        public async void OpenCreateChatPage()
         {
             if (!_session.IsUserLoggedIn)
             {
@@ -861,7 +866,7 @@ namespace Messanger
                 Chat newChat = new Chat() {Name = newChatName, IsPrivate = isChatPrivate, 
                     RoomId = _session.CurrentRoom.Id};
 
-                bool hasChatCreated = _chatService.CreateChat(newChat, _session.CurrentRoom);
+                bool hasChatCreated = await _chatService.CreateChat(newChat, _session.CurrentRoom);
 
                 if (hasChatCreated)
                 {
@@ -881,7 +886,7 @@ namespace Messanger
             
         }
 
-        public void OpenEnterChatPage()
+        public async void OpenEnterChatPage()
         {
             string pageContent;
             
@@ -896,7 +901,7 @@ namespace Messanger
                 Console.Write("Enter the name of the chat to enter: ");
                 string chatName = Console.ReadLine().Trim();
 
-                bool hasEnteredChat = _session.EnterChat(_chatService.GetChat(chatName, _session.CurrentRoom));
+                bool hasEnteredChat = await _session.EnterChat(await _chatService.GetChat(chatName, _session.CurrentRoom));
 
                 if (hasEnteredChat)
                 {

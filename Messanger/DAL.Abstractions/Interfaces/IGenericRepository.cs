@@ -26,5 +26,9 @@ namespace DAL.Abstractions.Interfaces
         public Task DeleteById(int id);
 
         public void Update(TEntity obj);
+
+        public Task InsertRange(IEnumerable<TEntity> entities);
+
+        public void DeleteRange(IEnumerable<TEntity> entities);
     }
 }

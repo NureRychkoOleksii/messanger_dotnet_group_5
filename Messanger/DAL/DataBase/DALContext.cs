@@ -19,6 +19,16 @@ public class DALContext : DbContext
     
     public DbSet<UsersInvitation> UsersInvitations { get; set; }
 
+    public DALContext(DbContextOptions<DALContext> options):base()
+    {
+        
+    }
+
+    public DALContext()
+    {
+        
+    }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlServer(@"Server=DESKTOP-MPQ8K2S;Database=Messenger_Group5;Trusted_Connection=True;");

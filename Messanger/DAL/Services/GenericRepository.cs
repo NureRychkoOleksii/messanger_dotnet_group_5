@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -66,6 +65,11 @@ namespace DAL.Services
             await _dbSet.AddAsync(obj);
         }
 
+        public async Task InsertRange(IEnumerable<TEntity> entities)
+        {
+            await _dbSet.AddRangeAsync(entities);
+        }
+
         public void Delete(TEntity obj)
         {
             if (_context.Entry(obj).State == EntityState.Detached)
@@ -76,6 +80,11 @@ namespace DAL.Services
             _dbSet.Remove(obj);
         }
 
+        public void DeleteRange(IEnumerable<TEntity> entities)
+        {
+            _dbSet.RemoveRange(entities);
+        }
+        
         public async Task DeleteById(int id)
         {
             var obj = await _dbSet.FindAsync(id);
