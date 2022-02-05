@@ -9,7 +9,7 @@ namespace BLL.Abstractions.Interfaces
     {
         void AddUser(int userId,int roomId);
         void RemoveUser(int userId, int roomId);
-
+        
         Task<IEnumerable<UsersInvitation>> GetUsers();
     }
 }

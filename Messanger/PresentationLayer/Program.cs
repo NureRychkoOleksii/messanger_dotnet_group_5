@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,14 +14,32 @@ namespace Messanger
         static async Task Main(string[] args)
         {
             // var unitOfWork = new UnitOfWork();
-
-            // await unitOfWork.UserRepository.Insert(new User()
+            //
+            // unitOfWork.CreateTransaction();
+            //
+            // try
             // {
-            //     Email = "oleksii.rychko@nure.ua",
-            //     Nickname = "Moonler",
-            //     Password = "1234",
-            // });
-            // await unitOfWork.Save();
+            //     await unitOfWork.UserRepository.Insert(new User()
+            //     {
+            //         Email = "oleksii.rychko@nure.ua",
+            //         Nickname = "Lexa",
+            //         Password = "12341234a!",
+            //     });
+            //     
+            //     await unitOfWork.SaveAsync();
+            //     
+            //     unitOfWork.Commit();
+            //     
+            // }
+            // catch (Exception e)
+            // {
+            //     Console.WriteLine("Lol");
+            //     unitOfWork.RollBack();
+            // }
+            // finally
+            // {
+            //     unitOfWork.Dispose();
+            // }
 
             // var user = await unitOfWork.UserRepository.Get();
             //
@@ -38,6 +56,7 @@ namespace Messanger
             var services = new ServiceCollection();
             ConfigureServices(services);
             var serviceProvider = services.BuildServiceProvider();
+            serviceProvider.GetService<App>().StartApp();
             await serviceProvider.GetService<App>().StartApp();
         }
 
@@ -49,7 +68,7 @@ namespace Messanger
                 .AddJsonFile("appsettings.json", optional: false)
                 .AddEnvironmentVariables()
                 .Build();
-            //services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
+            services.Configure<AppSettings>(configuration.GetSection("AppSettings"));
 
             services.AddScoped<App>();
 

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DAL.DataBase
 {
-
     public class DALContext : DbContext
     {
 
@@ -19,6 +18,16 @@ namespace DAL.DataBase
         public DbSet<RoomUsers> RoomUsers { get; set; }
 
         public DbSet<UsersInvitation> UsersInvitations { get; set; }
+      
+        public DALContext(DbContextOptions<DALContext> options):base()
+    {
+        
+    }
+
+    public DALContext()
+    {
+        
+    }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

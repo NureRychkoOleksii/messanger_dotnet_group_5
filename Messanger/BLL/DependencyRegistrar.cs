@@ -16,6 +16,7 @@ namespace BLL
             services.AddScoped<IUsersInvitationService, UserInvitationService>();
             services.AddScoped<IChatService, ChatService>();
             services.AddScoped<Session>();
+            services.AddScoped<Actions>();
             DAL.DependencyRegistrar.ConfigureServices(services);
         }
     }

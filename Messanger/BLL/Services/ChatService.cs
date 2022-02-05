@@ -1,29 +1,48 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BLL.Abstractions.Interfaces;
 using Core;
 using Core.Models;
 using DAL.Abstractions.Interfaces;
+using DAL.Services;
 
 namespace BLL.Services
 {
     public class ChatService : IChatService
     {
-        private readonly IRepository<Chat> _repository;
+        private readonly IGenericRepository<Chat> _repository;
+        private readonly UnitOfWork _unitOfWork = new UnitOfWork();
         private readonly IRoomService _roomService;
-
-        public ChatService(IRepository<Chat> repository, IRoomService roomService)
+        
+        public ChatService(IGenericRepository<Chat> repository, IRoomService roomService)
         {
             _repository = repository;
             _roomService = roomService;
         }
         
-        public bool CreateChat(Chat chat, Room room)
+        
+        public async Task<bool> CreateChat(Chat chat, Room room)
         {
-            if (!this.ChatExists(chat, room))
+            if (!(await this.ChatExists(chat, room)))
             {
-                _repository.CreateObjectAsync(chat);
+                _unitOfWork.CreateTransaction();
+            
+                try
+                {
+                    await Task.Run(() => _unitOfWork.ChatRepository.Insert(chat));
+
+                    await _unitOfWork.SaveAsync();
                 
+                    _unitOfWork.Commit();
+                
+                }
+                catch (Exception e)
+                {
+                    _unitOfWork.RollBack();
+                }
                 room.Chats.Add(chat);
                 _roomService.UpdateRoom(room);
                 return true;
@@ -33,42 +52,90 @@ namespace BLL.Services
                 return false;
             }
         }
-
-        public void DeleteChat(Chat chat)
+        
+        public async void DeleteChat(Chat chat)
         {
-            _repository.DeleteObjectAsync(chat);
+            _unitOfWork.CreateTransaction();
+            
+            try
+            {
+                _unitOfWork.ChatRepository.Delete(chat);
+
+                await _unitOfWork.SaveAsync();
+                
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
+                _unitOfWork.RollBack();
+            }
         }
-
-        public void UpdateChat(Chat chat)
+        
+        public async void UpdateChat(Chat chat)
         {
-            _repository.UpdateObjectAsync(chat);
+            _unitOfWork.CreateTransaction();
+            
+            try
+            {
+                _unitOfWork.ChatRepository.Update(chat);
+
+                await _unitOfWork.SaveAsync();
+                
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
+                _unitOfWork.RollBack();
+            }
         }
-
-        public IEnumerable<Chat> GetChats(Room room)
+        
+        
+        public async Task<IEnumerable<Chat>> GetChats(Room room)
         {
-            var chats = _repository.GetAllAsync(typeof(Chat)).Result
-                .Where(chat => chat.RoomId == room.Id);
-            return chats;
+            IEnumerable<Chat> users = null;
+            
+            _unitOfWork.CreateTransaction();
+            
+            try
+            {
+                var usersAsync = await _unitOfWork.ChatRepository.Get();
+
+                users = usersAsync.Where(chat => chat.RoomId == room.Id);
+
+                await _unitOfWork.SaveAsync();
+                
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
+                _unitOfWork.RollBack();
+            }
+
+            return users;
         }
-
-        public bool ChatExists(Chat chat, Room room)
+        
+        public async Task<bool> ChatExists(Chat chat, Room room)
         {
-            var roomChats = this.GetChats(room);
-
+            var roomChats = await this.GetChats(room);
+        
             var searchedChat = roomChats.Where(roomChat => roomChat.Name == chat.Name).FirstOrDefault();
-
+        
             if (searchedChat != null)
             {
                 return true;
             }
-
+        
             return false;
         }
 
-        public Chat GetChat(string chatName, Room room)
+        public async Task<Chat> GetChat(string chatName, Room room)
         {
-            var chats = this.GetChats(room)
-                .Where(chat => chat.Name == chatName)
+            var chatsAsync = await this.GetChats(room);
+            
+            var chats = chatsAsync.Where(chat => chat.Name == chatName)
                 .FirstOrDefault();
             return chats;
         }
