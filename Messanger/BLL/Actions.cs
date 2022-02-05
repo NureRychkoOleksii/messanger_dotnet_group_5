@@ -109,7 +109,8 @@ namespace BLL
             
             Thread.Sleep(1000);
             
-            Room createdRoom = await _roomService.GetRoom(someRoom => someRoom.RoomName == roomName);
+            var createdRoomResponse = await _roomService.GetRoom(someRoom => someRoom.RoomName == roomName);
+            Room createdRoom = createdRoomResponse.FirstOrDefault();
 
             RoomUsers roomUsers = new RoomUsers() {RoomId = createdRoom.Id, UserId = session.CurrentUser.Id};
             
@@ -125,7 +126,8 @@ namespace BLL
                 return Status.UserNotLoggedIn;
             }
 
-            Room room = await _roomService.GetRoom(someRoom => someRoom.RoomName == roomName);
+            var roomResponse = await _roomService.GetRoom(someRoom => someRoom.RoomName == roomName);
+            Room room = roomResponse.FirstOrDefault();
             bool hasEntered = await session.EnterRoom(room);
 
             if (hasEntered)
@@ -364,8 +366,8 @@ namespace BLL
             
             if (userToInvite is not null)
             {
-                _usersInvitationService.AddUser(userToInvite.Id, _session.CurrentRoom.Id);
-                _emailService.SendingEmailOnInviting(userToInvite,_session.CurrentRoom.RoomName);
+                _usersInvitationService.AddUser(userToInvite.FirstOrDefault().Id, _session.CurrentRoom.Id);
+                _emailService.SendingEmailOnInviting(userToInvite.FirstOrDefault(),_session.CurrentRoom.RoomName);
                 return Status.SuccessfullyInvitedUser;
             }
             else

@@ -14,26 +14,26 @@ namespace PL.Commands
     class ChatsCommand : GenericCommand<string>
     {
         private readonly Session _session;
-        private readonly IChatService _chatService;
+        private readonly Actions _actions;
 
-        public ChatsCommand(Session session, IChatService chatService)
+        public ChatsCommand(Session session, Actions actions)
         {
             _session = session;
-            _chatService = chatService;
+            _actions = actions;
         }
 
-        public async Task ExecuteAsync(string action)
+        public override async Task ExecuteAsync(string action)
         {
             switch (action.Trim().ToLower())
             {
                 case ConsolePages.ViewChatsPage:
-                    OpenViewChatsPage();
+                    await OpenViewChatsPage();
                     break;
                 case ConsolePages.CreateChatPage:
-                    OpenCreateChatPage();
+                    await OpenCreateChatPage();
                     break;
                 case ConsolePages.EnterChatPage:
-                    OpenEnterChatPage();
+                    await OpenEnterChatPage();
                     break;
                 case ConsolePages.ExitChatPage:
                     OpenExitChatPage();
@@ -41,65 +41,15 @@ namespace PL.Commands
             }
         }
 
-        public void OpenViewChatsPage()
+        private async Task OpenViewChatsPage()
         {
-            string pageContent = string.Concat(
-                "\nGo to:\n\n",
-                "view users\n",
-                "exit room\n",
-                "create role\n",
-                "delete tole\n",
-                "view roles\n",
-                "view chats\n",
-                "create chat\n",
-                "enter chat\n"
-            );
+            string pageContent;
+            string result = await _actions.ActionViewChats(_session);
+            Console.WriteLine($"\n{result}\n");
 
-            if (!_session.IsUserLoggedIn)
+            if (result != Status.NotInTheRoom && result != Status.UserNotLoggedIn)
             {
-                Console.WriteLine("\nError: not logged in\n\n");
-                return;
-            }
-
-            if (_session.CurrentRoom != null)
-            {
-                var chats = _chatService.GetChats(_session.CurrentRoom);
-
-                if (chats.Count() > 0)
-                {
-                    Console.WriteLine();
-
-                    foreach (Chat chat in chats)
-                    {
-                        Console.WriteLine(chat.Name);
-                    }
-
-                    Console.WriteLine();
-                }
-                else
-                {
-                    Console.WriteLine("\nYou have no chats.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("You are not in the room right now.");
-            }
-
-            Console.WriteLine(pageContent);
-        }
-
-        public void OpenCreateChatPage()
-        {
-            if (!_session.IsUserLoggedIn)
-            {
-                Console.WriteLine("\nError: not logged in\n\n");
-                return;
-            }
-
-            if (_session.CurrentRoom != null)
-            {
-                string pageContent = string.Concat(
+                pageContent = string.Concat(
                     "\nGo to:\n\n",
                     "view users\n",
                     "exit room\n",
@@ -110,147 +60,209 @@ namespace PL.Commands
                     "create chat\n",
                     "enter chat\n"
                 );
-
-                Console.Write("Enter the name of the new chat: ");
-                string newChatName = Console.ReadLine().Trim();
-
-                while (String.IsNullOrEmpty(newChatName))
-                {
-                    Console.WriteLine("Chat name can not be empty.");
-                    Console.Write("Enter the name of the new chat: ");
-                    newChatName = Console.ReadLine().Trim();
-                }
-
-                Console.Write("Is the chat private? (yes / no): ");
-                string isPrivate = Console.ReadLine().Trim().ToLower();
-
-                while (!isPrivate.Equals("yes") && !isPrivate.Equals("no"))
-                {
-                    Console.WriteLine("Wrong. Type \"yes\" or \"no\" ");
-                    isPrivate = Console.ReadLine().Trim();
-                }
-
-                bool isChatPrivate = isPrivate.Equals("yes") ? true : false;
-
-                Chat newChat = new Chat()
-                {
-                    Name = newChatName,
-                    IsPrivate = isChatPrivate,
-                    RoomId = _session.CurrentRoom.Id
-                };
-
-                bool hasChatCreated = _chatService.CreateChat(newChat, _session.CurrentRoom);
-
-                if (hasChatCreated)
-                {
-                    Console.WriteLine($"Chat {newChatName} successfully created!");
-                }
-                else
-                {
-                    Console.WriteLine($"Chat {newChatName} already exists.");
-                }
-
-                Console.WriteLine(pageContent);
             }
-            else
+            else if (result == Status.NotInTheRoom)
             {
-                Console.WriteLine("You are not in the room right now.");
-            }
-
-        }
-
-        public void OpenEnterChatPage()
-        {
-            string pageContent;
-
-            if (!_session.IsUserLoggedIn)
-            {
-                Console.WriteLine("\nError: not logged in\n\n");
-                return;
-            }
-
-            if (_session.CurrentRoom != null)
-            {
-                Console.Write("Enter the name of the chat to enter: ");
-                string chatName = Console.ReadLine().Trim();
-
-                bool hasEnteredChat = _session.EnterChat(_chatService.GetChat(chatName, _session.CurrentRoom));
-
-                if (hasEnteredChat)
-                {
-                    Console.WriteLine($"Welcome to the chat {chatName}!");
-                    pageContent = string.Concat(
-                        "\nGo to:\n\n",
-                        "exit chat\n"
-                    );
-                }
-                else
-                {
-                    Console.WriteLine($"No chat {chatName} exists in the current room.");
-
-                    pageContent = string.Concat(
-                        "\nGo to:\n\n",
-                        "view users\n",
-                        "exit room\n",
-                        "create role\n",
-                        "delete tole\n",
-                        "view roles\n",
-                        "view chats\n",
-                        "create chat\n",
-                        "enter chat\n"
-                    );
-                }
-            }
-            else
-            {
-                Console.WriteLine("You are not in the room right now.");
                 pageContent = string.Concat(
                     $"\nHello, {_session.CurrentUser.Nickname}!\n",
                     "\nGo to:\n\n",
+                    "enter room\n",
+                    "view rooms\n",
+                    "my invitations\n",
+                    "create room\n",
+                    "logout\n",
+                    "exit\n"
+                );
+            }
+            else
+            {
+                pageContent = string.Concat(
+                    "\nGo to:\n\n",
+                    "login\n",
+                    "register\n",
+                    "exit\n"
+                );
+            }
+            Console.WriteLine(pageContent);
+        }
+
+        public async Task OpenCreateChatPage()
+        {
+            string pageContent;
+            Console.Write("Enter the name of the new chat: ");
+            string newChatName = Console.ReadLine().Trim();
+
+            Console.Write("Is the chat private? (yes or anything else): ");
+            string isPrivate = Console.ReadLine().Trim().ToLower();
+
+            string result = await _actions.ActionCreateChat(_session, newChatName, isPrivate, _session.CurrentRoom.Id);
+            Console.WriteLine($"\n{result}\n");
+
+            if (result != Status.NotInTheRoom && result != Status.UserNotLoggedIn)
+            {
+                pageContent = string.Concat(
+                    "\nGo to:\n\n",
                     "view users\n",
                     "exit room\n",
                     "create role\n",
                     "delete tole\n",
                     "view roles\n",
-                    "create chat\n",
                     "view chats\n",
+                    "create chat\n",
                     "enter chat\n"
                 );
             }
+            else if (result == Status.NotInTheRoom)
+            {
+                pageContent = string.Concat(
+                    $"\nHello, {_session.CurrentUser.Nickname}!\n",
+                    "\nGo to:\n\n",
+                    "enter room\n",
+                    "view rooms\n",
+                    "my invitations\n",
+                    "create room\n",
+                    "logout\n",
+                    "exit\n"
+                );
+            }
+            else
+            {
+                pageContent = string.Concat(
+                    "\nGo to:\n\n",
+                    "login\n",
+                    "register\n",
+                    "exit\n"
+                );
+            }
             Console.WriteLine(pageContent);
+
+        }
+
+        public async Task OpenEnterChatPage()
+        {
+            string pageContent;
+
+            Console.Write("Enter the name of the chat to enter: ");
+            string chatName = Console.ReadLine().Trim();
+
+            string result = await _actions.ActionEnterChat(_session, chatName);
+            Console.WriteLine($"\n{result}\n");
+
+            if (result != Status.NotInTheRoom && result != Status.UserNotLoggedIn)
+            {
+                pageContent = string.Concat(
+                    "\nGo to:\n\n",
+                    "view users\n",
+                    "exit room\n",
+                    "create role\n",
+                    "delete tole\n",
+                    "view roles\n",
+                    "view chats\n",
+                    "create chat\n",
+                    "enter chat\n"
+                );
+            }
+            else if (result == Status.NotInTheRoom)
+            {
+                pageContent = string.Concat(
+                    $"\nHello, {_session.CurrentUser.Nickname}!\n",
+                    "\nGo to:\n\n",
+                    "enter room\n",
+                    "view rooms\n",
+                    "my invitations\n",
+                    "create room\n",
+                    "logout\n",
+                    "exit\n"
+                );
+            }
+            else
+            {
+                pageContent = string.Concat(
+                    "\nGo to:\n\n",
+                    "login\n",
+                    "register\n",
+                    "exit\n"
+                );
+            }
+            Console.WriteLine(pageContent);
+
+            // if (_session.CurrentRoom != null)
+            // {
+            //
+            //     bool hasEnteredChat = _session.EnterChat(_chatService.GetChat(chatName, _session.CurrentRoom));
+            //
+            //     if (hasEnteredChat)
+            //     {
+            //         Console.WriteLine($"Welcome to the chat {chatName}!");
+            //         pageContent = string.Concat(
+            //             "\nGo to:\n\n",
+            //             "exit chat\n"
+            //         );
+            //     }
+            //     else
+            //     {
+            //         Console.WriteLine($"No chat {chatName} exists in the current room.");
+            //
+            //         pageContent = string.Concat(
+            //             "\nGo to:\n\n",
+            //             "view users\n",
+            //             "exit room\n",
+            //             "create role\n",
+            //             "delete tole\n",
+            //             "view roles\n",
+            //             "view chats\n",
+            //             "create chat\n",
+            //             "enter chat\n"
+            //         );
+            //     }
+            // }
+            // else
+            // {
+            //     Console.WriteLine("You are not in the room right now.");
+            //     pageContent = string.Concat(
+            //         $"\nHello, {_session.CurrentUser.Nickname}!\n",
+            //         "\nGo to:\n\n",
+            //         "view users\n",
+            //         "exit room\n",
+            //         "create role\n",
+            //         "delete tole\n",
+            //         "view roles\n",
+            //         "create chat\n",
+            //         "view chats\n",
+            //         "enter chat\n"
+            //     );
+            // }
         }
 
         public void OpenExitChatPage()
         {
-            if (!_session.IsUserLoggedIn)
+            string pageContent;
+            string result = _actions.ActionExitChat(_session);
+            Console.WriteLine($"\n{result}\n");
+
+            if (result != Status.UserNotLoggedIn)
             {
-                Console.WriteLine("\nError: not logged in\n\n");
-                return;
-            }
-
-            string pageContent = string.Concat(
-                "\nGo to:\n\n",
-                "view users\n",
-                "exit room\n",
-                "create role\n",
-                "delete tole\n",
-                "view roles\n",
-                "view chats\n",
-                "create chat\n",
-                "enter chat\n"
-            );
-
-            bool hasExitedChat = _session.ExitChat();
-
-            if (hasExitedChat)
-            {
-                Console.WriteLine("Successfully exited!");
+                pageContent = string.Concat(
+                    "\nGo to:\n\n",
+                    "view users\n",
+                    "exit room\n",
+                    "create role\n",
+                    "delete tole\n",
+                    "view roles\n",
+                    "view chats\n",
+                    "create chat\n",
+                    "enter chat\n"
+                );
             }
             else
             {
-                Console.WriteLine("You are not in the chat right now.");
+                pageContent = string.Concat(
+                    "\nGo to:\n\n",
+                    "login\n",
+                    "register\n",
+                    "exit\n"
+                );
             }
-
             Console.WriteLine(pageContent);
         }
     }

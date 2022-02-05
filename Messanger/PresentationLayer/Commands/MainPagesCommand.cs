@@ -18,7 +18,7 @@ namespace PL.Commands
             _session = session;
         }
 
-        public async Task ExecuteAsync(string action)
+        public override async Task ExecuteAsync(string action)
         {
             switch (action.Trim().ToLower())
             {

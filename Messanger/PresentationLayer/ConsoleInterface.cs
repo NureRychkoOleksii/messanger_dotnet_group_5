@@ -9,9 +9,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using BLL;
-using BLL.Abstractions.Interfaces;
-using Core;
-using Core.Models;
 using PL.Abstractions.Interfaces;
 using PL.Commands;
 
@@ -20,27 +17,13 @@ namespace Messanger
     public class ConsoleInterface
     {
         private readonly Session _session;
-        private readonly IUserService _userService;
-        private readonly IRoomService _roomService;
-        private readonly IRoomUsersService _roomUsersService;
-        private readonly IEmailService _emailService;
-        private readonly IUsersInvitationService _usersInvitationService;
-        private readonly IChatService _chatService;
         private readonly Actions _actions;
 
         private Dictionary<string, GenericCommand<string>> _actionPageMap = new Dictionary<string, GenericCommand<string>>();
 
-        public ConsoleInterface(Session session, IUserService userService, IRoomService roomService,
-            IRoomUsersService roomUsersService, IEmailService emailService, 
-            IUsersInvitationService usersInvitationService, IChatService chatService, Actions actions)
+        public ConsoleInterface(Session session, Actions actions)
         {
             _session = session;
-            _userService = userService;
-            _roomService = roomService;
-            _roomUsersService = roomUsersService;
-            _emailService = emailService;
-            _usersInvitationService = usersInvitationService;
-            _chatService = chatService;
             _actions = actions;
 
             InitActionPageMap();
@@ -57,281 +40,15 @@ namespace Messanger
                 action = Console.ReadLine();
             }
         }
-        private void ResolveAction(string action)
-        {
-            switch (action.Trim().ToLower())
-            {
-                case "start":
-                    OpenStartPage();
-                    break;
-                case "main":
-                    OpenMainPage();
-                    break;
-                case "login":
-                    OpenLoginPage();
-                    break;
-                case "register":
-                    OpenRegisterPage();
-                    break;
-                case "logout":
-                    OpenLogoutPage();
-                    break;
-                case "create room":
-                    OpenCreateRoomPage();
-                    break;
-                case "view rooms":
-                    OpenViewUserRooms();
-                    break;
-                case "view users":
-                    OpenViewUsersPage();
-                    break;
-                case "enter room":
-                    OpenEnterRoomPage();
-                    break;
-                case "exit room":
-                    OpenExitRoomPage();
-                    break;
-                // case "create role":
-                //     OpenCreateRolePage();
-                //     break;
-                // case "delete role":
-                //     OpenDeleteRolePage();
-                //     break;
-                // case "view roles":
-                //     OpenViewRolesPage();
-                //     break;
-                case "invite user":
-                    OpenInvitationPage();
-                    break;
-                case "my invitations":
-                    OpenMyInvitationsPage();
-                    break;
-                case "update room name":
-                    //OpenUpdateRoomNamePage();
-                    break;
-                case "view chats":
-                    OpenViewChatsPage();
-                    break;
-                case "enter chat":
-                    OpenEnterChatPage();
-                    break;
-                case "exit chat":
-                    OpenExitChatPage();
-                    break;
-                case "create chat":
-                    OpenCreateChatPage();
-                    break;
-                default:
-                    Console.WriteLine($"No such page {action}");
-                    break;
-            }
-        }
 
-        private async void OpenMyInvitationsPage()
-        {
-            string result;
-            Tuple<string, UsersInvitation> checkInvitations = await _actions.ActionCheckInvitations(_session);
-            Console.WriteLine($"\n{checkInvitations.Item1}\n");
-
-            if (checkInvitations.Item2 != null)
-            {
-                var answer = Console.ReadLine().Trim().ToLower();
-                result = await _actions.ActionAcceptInvitation(_session, answer, checkInvitations.Item2.RoomId,
-                    checkInvitations.Item2.UserId);
-                Console.WriteLine($"\n{result}\n");
-            }
-            //_usersInvitationService.RemoveUser(isUserInvited.Id,_session.CurrentRoom.Id);
-
-        }
-        
-        private async void OpenInvitationPage()
-        {
-
-            Console.WriteLine("Enter a nickname of user or 'exit'");
-
-            string user = Console.ReadLine().Trim();
-
-            string result = await _actions.ActionInviteUser(_session, user);
-            Console.WriteLine($"\n{result}\n");
-            
-            // string pageContent = String.Empty;
-            //
-            // if (_session.IsUserLoggedIn)
-            // {
-            //     pageContent = string.Concat(
-            //         "\nGo to:\n\n",
-            //         "logout\n"
-            //     );
-            // }
-            // else
-            // {
-            //     pageContent = string.Concat(
-            //         "\nWrite a nickname of user:\n\n",
-            //         "invite user\n",
-            //         "exit\n"
-            //     );
-            // }
-            //
-            // Console.WriteLine(pageContent);
-        }
-
-        private void OpenStartPage()
-        {
-            string pageContent = string.Empty;
-
-            if (_session.IsUserLoggedIn)
-            {
-                pageContent = string.Concat(
-                    "\nGo to:\n\n",
-                    "logout\n"
-                );
-            }
-            else
-            {
-                pageContent = string.Concat(
-                    "\nGo to:\n\n",
-                    "login\n",
-                    "register\n",
-                    "exit\n"
-                );
-            }
-
-            Console.WriteLine(pageContent);
-        }
-
-        private void OpenMainPage()
-        {
-            if (!_session.IsUserLoggedIn)
-            {
-                Console.WriteLine("\nError: not logged in\n\n");
-                return;
-            }
-
-            string pageContent = string.Concat(
-                $"\nHello, {_session.CurrentUser.Nickname}!\n",
-                "\nGo to:\n\n",
-                "enter room\n",
-                "view rooms\n",
-                "my invitations\n",
-                "create room\n",
-                "logout\n",
-                "exit\n"
-            );
-
-            Console.WriteLine(pageContent);
-        }
-
-        private async void OpenLoginPage()
-        {
-            Console.Write("Username: "); 
-            string username = Console.ReadLine().Trim();
-            
-            Console.Write("Password: ");
-            string password = Console.ReadLine().Trim();
-
-            string result = await _actions.ActionLogin(_session, username, password);
-            Console.WriteLine($"\n{result}\n");
-            
-            if (result.Equals(Status.SuccessfullyLoggedIn))
-            {
-                string pageContent = string.Concat(
-                        "\nGo to:\n\n",
-                        "main\n",
-                        "logout\n",
-                        "exit\n"
-                    );
-
-                Console.WriteLine(pageContent);
-            }
-            else 
-            {
-                    Console.WriteLine($"User {username} does not exist or the password is wrong, try again"); 
-            }
-            
-        }
-
-        private async void OpenRegisterPage()
-        {
-            string pageContent;
-            Console.Write("Username: ");
-            string username = Console.ReadLine().Trim();
-                
-            Console.Write("Email: ");
-            string email = Console.ReadLine().Trim();
-
-            Console.Write("Password (any letters, 8-24 length, symbols(!#$%&): ");
-            string password = Console.ReadLine().Trim();
-
-            Console.Write("Confirm password: ");
-            string confirmPassword = Console.ReadLine().Trim();
-
-            string result = await _actions.ActionRegisterUser(_session, username, password, confirmPassword, email);
-            Console.WriteLine($"\n{result}\n");
-
-            if (_session.IsUserLoggedIn)
-            {
-                pageContent = string.Concat(
-                        "Go to:\n\n",
-                        "main\n",
-                        "logout\n",
-                        "exit\n"
-                        );
-            }
-            else
-            {
-                pageContent = string.Concat(
-                        "Go to:\n\n",
-                        "login\n",
-                        "register\n",
-                        "exit\n"
-                    );
-            }
-
-            Console.WriteLine(pageContent);
-        }
-
-        
-
-        private void OpenLogoutPage()
-        {
-            string result = _actions.ActionLogout(_session);
-            Console.WriteLine($"\n{result}\n");
-
-            string pageContent = string.Concat(
-                "\nGo to:\n\n",
-                "login\n",
-                "register\n",
-                "exit\n"
-            );
-
-            Console.WriteLine(pageContent);
-        }
-
-        private async void OpenCreateRoomPage()
-        {
-
-            // create room
-            Console.Write("Enter room name: ");
-            string roomName = Console.ReadLine().Trim();
-
-            // var condition = await _roomService.RoomExists(roomName);
-
-            string result = await _actions.ActionCreateRoom(_session, roomName);
-            
-            Console.WriteLine(result);
-
-            Thread.Sleep(1000);
-        }
-      
         private void InitActionPageMap()
         {
             MainPagesCommand mainPagesCommand = new MainPagesCommand(_session);
-            AuthenticationCommand authenticationCommand = new AuthenticationCommand(_session, _userService, _emailService);
-            RoomsCommand roomsCommand = new RoomsCommand(_session, _roomService, _roomUsersService);
-            RolesCommand rolesCommand = new RolesCommand(_session, _roomService, _roomUsersService);
-            ChatsCommand chatsCommand = new ChatsCommand(_session, _chatService);
-            UserInvitationsCommand userInvitationsCommand = new UserInvitationsCommand(_session, _userService, _roomService,
-                _roomUsersService, _usersInvitationService, _emailService);
+            AuthenticationCommand authenticationCommand = new AuthenticationCommand(_session, _actions);
+            RoomsCommand roomsCommand = new RoomsCommand(_session, _actions);
+            //RolesCommand rolesCommand = new RolesCommand(_session, _roomService, _roomUsersService);
+            ChatsCommand chatsCommand = new ChatsCommand(_session, _actions);
+            UserInvitationsCommand userInvitationsCommand = new UserInvitationsCommand(_session, _actions);
 
             _actionPageMap.Add(ConsolePages.StartPage, mainPagesCommand);
             _actionPageMap.Add(ConsolePages.MainPage, mainPagesCommand);
@@ -345,15 +62,15 @@ namespace Messanger
             _actionPageMap.Add(ConsolePages.ViewUsersPage, roomsCommand);
             _actionPageMap.Add(ConsolePages.EnterRoomPage, roomsCommand);
             _actionPageMap.Add(ConsolePages.ExitRoomPage, roomsCommand);
-            _actionPageMap.Add(ConsolePages.UpdateRoomName, roomsCommand);
+            //_actionPageMap.Add(ConsolePages.UpdateRoomName, roomsCommand);
 
-            _actionPageMap.Add(ConsolePages.CreateRolePage, rolesCommand);
-            _actionPageMap.Add(ConsolePages.ViewRolesPage, rolesCommand);
-            _actionPageMap.Add(ConsolePages.DeleteRolePage, rolesCommand);
+            //_actionPageMap.Add(ConsolePages.CreateRolePage, rolesCommand);
+            //_actionPageMap.Add(ConsolePages.ViewRolesPage, rolesCommand);
+            //_actionPageMap.Add(ConsolePages.DeleteRolePage, rolesCommand);
 
             _actionPageMap.Add(ConsolePages.CreateChatPage, chatsCommand);
             _actionPageMap.Add(ConsolePages.ViewChatsPage, chatsCommand);
-            _actionPageMap.Add(ConsolePages.EnterRoomPage, chatsCommand);
+            _actionPageMap.Add(ConsolePages.EnterChatPage, chatsCommand);
             _actionPageMap.Add(ConsolePages.ExitChatPage, chatsCommand);
 
             _actionPageMap.Add(ConsolePages.InviteUserPage, userInvitationsCommand);
@@ -373,102 +90,6 @@ namespace Messanger
                 Console.WriteLine($"\nNo such page {action}\n\n");
             }
         }
-      
-        private async void OpenViewUserRooms()
-            string pageContent = String.Concat($"\nHello, {_session.CurrentUser.Nickname}!\n",
-            "\nGo to:\n\n",
-            "enter room\n",
-            "view rooms\n",
-            "create room\n",
-            "invite user\n",
-            "logout\n",
-            "exit\n"
-            );
-
-            string result = await _actions.ActionViewRooms(_session);
-            Console.WriteLine($"\n{result}\n");
-
-            Console.WriteLine(pageContent);
-        }
-
-        private async void OpenEnterRoomPage()
-        {
-            string pageContent;
-            Console.Write("Enter the name of the room: ");
-            string roomName = Console.ReadLine().Trim();
-          
-            // update room name
-            // delete room
-            // remove users
-            // leave room
-            string result = await _actions.ActionEnterRoom(_session, roomName);
-            Console.WriteLine($"\n{result}\n");
-            
-            if (result == Status.SuccessfullyEnteredRoom)
-            {
-                Console.WriteLine($"Welcome to the room {_session.CurrentRoom.RoomName}!");
-                pageContent = string.Concat(
-                    $"\nHello, {_session.CurrentUser.Nickname}!\n",
-                    "\nGo to:\n\n",
-                    "view users\n",
-                    "exit room\n",
-                    "create role\n",
-                    "delete tole\n",
-                    "view roles\n",
-                    "invite user\n",
-                    "create chat\n",
-                    "view chats\n",
-                    "update room name\n",
-                    "enter chat\n"
-                );
-            }
-            else if (result == Status.NoRoomsFound || result == Status.NoSuchRoomFound)
-            {
-                // Console.WriteLine($"No room {roomName} in your list of rooms");
-
-                pageContent = string.Concat(
-                    $"\nHello, {_session.CurrentUser.Nickname}!\n",
-                    "\nGo to:\n\n",
-                    "enter room\n",
-                    "view rooms\n",
-                    "create room\n",
-                    "invite user\n",
-                    "logout\n",
-                    "exit\n"
-                );
-            }
-            else //if (result == Status.UserNotLoggedIn)
-            {
-                pageContent = string.Concat(
-                    "Go to:\n\n",
-                    "login\n",
-                    "register\n",
-                    "exit\n"
-                );
-            }
-
-            Console.WriteLine(pageContent);
-        }
-
-        public void OpenExitRoomPage()
-        {
-
-            string pageContent = string.Concat(
-                $"\nHello, {_session.CurrentUser.Nickname}!\n",
-                "\nGo to:\n\n",
-                "enter room\n",
-                "view rooms\n",
-                "create room\n",
-                "logout\n",
-                "exit\n"
-            );
-
-            string result = _actions.ActionExitRoom(_session);
-            Console.WriteLine($"\n{result}\n");
-
-            Console.WriteLine(pageContent);
-        }
-
 
         // public async void OpenCreateRolePage()
         // {
@@ -596,43 +217,6 @@ namespace Messanger
         //     Console.WriteLine(pageContent);
         // }
         //
-        private async void OpenViewUsersPage()
-        {
-            string pageContent = string.Empty;
-        
-            string result = await _actions.ActionViewUsers(_session);
-            Console.WriteLine($"\n{result}\n");
-            
-            if (result != Status.NotInTheRoom && result != Status.UserNotLoggedIn)
-            {
-                pageContent = string.Concat(
-                    $"\nHello, {_session.CurrentUser.Nickname}!\n",
-                    "\nGo to:\n\n",
-                    "enter room\n",
-                    "view rooms\n",
-                    "create room\n",
-                    "logout\n",
-                    "exit\n"
-                );
-            }
-            else
-            {
-                pageContent = string.Concat(
-                    "\nGo to:\n\n",
-                    "view users\n",
-                    "exit room\n",
-                    "create role\n",
-                    "delete tole\n",
-                    "view roles\n",
-                    "create chat\n",
-                    "view chats\n",
-                    "enter chat\n"
-                );
-            }
-        
-            Console.WriteLine(pageContent);
-        }
-
         
         // private async void OpenUpdateRoomNamePage()
         // {
@@ -672,231 +256,5 @@ namespace Messanger
         //         Console.WriteLine("\nError: enter a room first");
         //     }
         // }
-
-        public async void OpenViewChatsPage()
-        {
-            string pageContent;
-            string result = await _actions.ActionViewChats(_session);
-            Console.WriteLine($"\n{result}\n");
-            
-            if (result != Status.NotInTheRoom && result != Status.UserNotLoggedIn)
-            {
-                pageContent = string.Concat(
-                    "\nGo to:\n\n",
-                    "view users\n",
-                    "exit room\n",
-                    "create role\n",
-                    "delete tole\n",
-                    "view roles\n",
-                    "view chats\n",
-                    "create chat\n",
-                    "enter chat\n"
-                );
-            }
-            else if (result == Status.NotInTheRoom)
-            {
-                pageContent = string.Concat(
-                    $"\nHello, {_session.CurrentUser.Nickname}!\n",
-                    "\nGo to:\n\n",
-                    "enter room\n",
-                    "view rooms\n",
-                    "my invitations\n",
-                    "create room\n",
-                    "logout\n",
-                    "exit\n"
-                );
-            }
-            else
-            {
-                pageContent = string.Concat(
-                    "\nGo to:\n\n",
-                    "login\n",
-                    "register\n",
-                    "exit\n"
-                );
-            }
-            Console.WriteLine(pageContent);
-        }
-
-        public async void OpenCreateChatPage()
-        {
-            string pageContent;
-            Console.Write("Enter the name of the new chat: ");
-            string newChatName = Console.ReadLine().Trim();
-                
-            Console.Write("Is the chat private? (yes or anything else): ");
-            string isPrivate = Console.ReadLine().Trim().ToLower();
-
-            string result = await _actions.ActionCreateChat(_session, newChatName, isPrivate, _session.CurrentRoom.Id);
-            Console.WriteLine($"\n{result}\n");
-            
-            if (result != Status.NotInTheRoom && result != Status.UserNotLoggedIn) 
-            {
-                pageContent = string.Concat(
-                    "\nGo to:\n\n",
-                    "view users\n",
-                    "exit room\n",
-                    "create role\n",
-                    "delete tole\n",
-                    "view roles\n",
-                    "view chats\n",
-                    "create chat\n",
-                    "enter chat\n"
-                );
-            }
-            else if (result == Status.NotInTheRoom)
-            {
-                pageContent = string.Concat(
-                    $"\nHello, {_session.CurrentUser.Nickname}!\n",
-                    "\nGo to:\n\n",
-                    "enter room\n",
-                    "view rooms\n",
-                    "my invitations\n",
-                    "create room\n",
-                    "logout\n",
-                    "exit\n"
-                );
-            }
-            else
-            {
-                pageContent = string.Concat(
-                    "\nGo to:\n\n",
-                    "login\n",
-                    "register\n",
-                    "exit\n"
-                );
-            }
-            Console.WriteLine(pageContent);
-            
-        }
-
-        public async void OpenEnterChatPage()
-        {
-            string pageContent;
-            
-            Console.Write("Enter the name of the chat to enter: ");
-            string chatName = Console.ReadLine().Trim();
-
-            string result = await _actions.ActionEnterChat(_session, chatName);
-            Console.WriteLine($"\n{result}\n");
-            
-            if (result != Status.NotInTheRoom && result != Status.UserNotLoggedIn) 
-            {
-                pageContent = string.Concat(
-                    "\nGo to:\n\n",
-                    "view users\n",
-                    "exit room\n",
-                    "create role\n",
-                    "delete tole\n",
-                    "view roles\n",
-                    "view chats\n",
-                    "create chat\n",
-                    "enter chat\n"
-                );
-            }
-            else if (result == Status.NotInTheRoom)
-            {
-                pageContent = string.Concat(
-                    $"\nHello, {_session.CurrentUser.Nickname}!\n",
-                    "\nGo to:\n\n",
-                    "enter room\n",
-                    "view rooms\n",
-                    "my invitations\n",
-                    "create room\n",
-                    "logout\n",
-                    "exit\n"
-                );
-            }
-            else
-            {
-                pageContent = string.Concat(
-                    "\nGo to:\n\n",
-                    "login\n",
-                    "register\n",
-                    "exit\n"
-                );
-            }
-            Console.WriteLine(pageContent);
-            
-            // if (_session.CurrentRoom != null)
-            // {
-            //
-            //     bool hasEnteredChat = _session.EnterChat(_chatService.GetChat(chatName, _session.CurrentRoom));
-            //
-            //     if (hasEnteredChat)
-            //     {
-            //         Console.WriteLine($"Welcome to the chat {chatName}!");
-            //         pageContent = string.Concat(
-            //             "\nGo to:\n\n",
-            //             "exit chat\n"
-            //         );
-            //     }
-            //     else
-            //     {
-            //         Console.WriteLine($"No chat {chatName} exists in the current room.");
-            //
-            //         pageContent = string.Concat(
-            //             "\nGo to:\n\n",
-            //             "view users\n",
-            //             "exit room\n",
-            //             "create role\n",
-            //             "delete tole\n",
-            //             "view roles\n",
-            //             "view chats\n",
-            //             "create chat\n",
-            //             "enter chat\n"
-            //         );
-            //     }
-            // }
-            // else
-            // {
-            //     Console.WriteLine("You are not in the room right now.");
-            //     pageContent = string.Concat(
-            //         $"\nHello, {_session.CurrentUser.Nickname}!\n",
-            //         "\nGo to:\n\n",
-            //         "view users\n",
-            //         "exit room\n",
-            //         "create role\n",
-            //         "delete tole\n",
-            //         "view roles\n",
-            //         "create chat\n",
-            //         "view chats\n",
-            //         "enter chat\n"
-            //     );
-            // }
-        }
-
-
-        public async void OpenExitChatPage()
-        {
-            string pageContent;
-            string result = _actions.ActionExitChat(_session);
-            Console.WriteLine($"\n{result}\n");
-            
-            if (result != Status.UserNotLoggedIn)
-            {
-                pageContent = string.Concat(
-                    "\nGo to:\n\n",
-                    "view users\n",
-                    "exit room\n",
-                    "create role\n",
-                    "delete tole\n",
-                    "view roles\n",
-                    "view chats\n",
-                    "create chat\n",
-                    "enter chat\n"
-                );
-            }
-            else
-            {
-                pageContent = string.Concat(
-                    "\nGo to:\n\n",
-                    "login\n",
-                    "register\n",
-                    "exit\n"
-                );
-            }
-            Console.WriteLine(pageContent);
-        }
     }
 }

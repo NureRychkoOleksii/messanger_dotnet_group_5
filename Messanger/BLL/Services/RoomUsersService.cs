@@ -164,38 +164,38 @@ namespace BLL.Services
             return rooms;
         }
 
-        public async Task<Role> GetUserRole(User user, Room room)
-        {
-            IEnumerable<RoomUsers> rooms = null;
+        //public async Task<Role> GetUserRole(User user, Room room)
+        //{
+        //    IEnumerable<RoomUsers> rooms = null;
             
-            try
-            {
-                var roomsAsync = await _unitOfWork.RoomUsersRepository.Get();
+        //    try
+        //    {
+        //        var roomsAsync = await _unitOfWork.RoomUsersRepository.Get();
 
-                rooms = roomsAsync.Where(x => x.UserId == user.Id && x.RoomId == room.Id);
+        //        rooms = roomsAsync.Where(x => x.UserId == user.Id && x.RoomId == room.Id);
 
-                await _unitOfWork.SaveAsync();
+        //        await _unitOfWork.SaveAsync();
                 
-                _unitOfWork.Commit();
+        //        _unitOfWork.Commit();
                 
-            }
-            catch (Exception e)
-            {
-                try
-                {
-                    _unitOfWork.RollBack();
-                }
-                catch(Exception e1)
-                {
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        try
+        //        {
+        //            _unitOfWork.RollBack();
+        //        }
+        //        catch(Exception e1)
+        //        {
                     
-                }
-            }
+        //        }
+        //    }
 
-            int roleId = rooms.FirstOrDefault().RoomId;
-            Role role = room.Roles[roleId];
-            return role;
+        //    int roleId = rooms.FirstOrDefault().RoomId;
+        //    Role role = room.Roles[roleId];
+        //    return role;
             
-        }
+        //}
         
         // public async Task<Role> GetUserRole(User user, Room room)
         // {

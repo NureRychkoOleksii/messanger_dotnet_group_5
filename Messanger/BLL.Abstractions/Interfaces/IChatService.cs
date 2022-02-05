@@ -8,7 +8,7 @@ namespace BLL.Abstractions.Interfaces
 {
     public interface IChatService
     {
-        void CreateChat(Chat chat, Room room);
+        Task<bool> CreateChat(Chat chat, Room room);
         void DeleteChat(Chat chat);
         void UpdateChat(Chat chat);
         Task<IEnumerable<Chat>> GetChats(Room room);

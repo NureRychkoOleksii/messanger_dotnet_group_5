@@ -4,35 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BLL;
-using BLL.Abstractions.Interfaces;
 using Core.Models;
 using PL.Abstractions.Interfaces;
 using Messanger;
-using System.Threading;
 
 namespace PL.Commands
 {
     class UserInvitationsCommand : GenericCommand<string>
     {
         private readonly Session _session;
-        private readonly IUserService _userService;
-        private readonly IRoomService _roomService;
-        private readonly IRoomUsersService _roomUsersService;
-        private readonly IUsersInvitationService _usersInvitationService;
-        private readonly IEmailService _emailService;
+        private readonly Actions _actions;
 
-        public UserInvitationsCommand(Session session, IUserService userService, IRoomService roomService,
-            IRoomUsersService roomUsersService, IUsersInvitationService usersInvitationService, IEmailService emailService)
+        public UserInvitationsCommand(Session session, Actions actions)
         {
             _session = session;
-            _userService = userService;
-            _roomService = roomService;
-            _roomUsersService = roomUsersService;
-            _usersInvitationService = usersInvitationService;
-            _emailService = emailService;
+            _actions = actions;
         }
 
-        public async Task ExecuteAsync(string action)
+        public override async Task ExecuteAsync(string action)
         {
             switch (action.Trim().ToLower())
             {
@@ -47,69 +36,31 @@ namespace PL.Commands
 
         private async Task OpenMyInvitationsPage()
         {
-            if (!_session.IsUserLoggedIn)
+            string result;
+            Tuple<string, UsersInvitation> checkInvitations = await _actions.ActionCheckInvitations(_session);
+            Console.WriteLine($"\n{checkInvitations.Item1}\n");
+
+            if (checkInvitations.Item2 != null)
             {
-                Console.WriteLine("\nError: not logged in\n\n");
-                return;
+                var answer = Console.ReadLine().Trim().ToLower();
+                result = await _actions.ActionAcceptInvitation(_session, answer, checkInvitations.Item2.RoomId,
+                    checkInvitations.Item2.UserId);
+                Console.WriteLine($"\n{result}\n");
             }
+            //_usersInvitationService.RemoveUser(isUserInvited.Id,_session.CurrentRoom.Id);
 
-            var usersInvitationsAsync = await _usersInvitationService.GetUsers();
-            var usersInvitations = usersInvitationsAsync.ToList();
-
-            var isUserInvited = usersInvitations.Where(user => _session.CurrentUser.Id == user.UserId).FirstOrDefault();
-
-            var rooms = await _roomService.GetRooms();
-            var roomName = rooms.ToList().Where(room => room.Id == isUserInvited.RoomId).FirstOrDefault().RoomName;
-
-            if (isUserInvited != null)
-            {
-                Console.WriteLine($"You are invited in room {roomName}, do you want to accept this invitation?");
-                var answer = Console.ReadLine().ToLower();
-                if (answer.Equals("yes"))
-                {
-                    var roomUsers = new RoomUsers()
-                    { RoomId = isUserInvited.RoomId, UserId = isUserInvited.UserId, UserRole = 1 };
-                    _roomUsersService.CreateRoomUsers(roomUsers);
-                    // _usersInvitationService.RemoveUser(isUserInvited.Id,_session.CurrentRoom.Id);
-                }
-                else
-                {
-                    Console.WriteLine(":(");
-                    //_usersInvitationService.RemoveUser(isUserInvited.Id,_session.CurrentRoom.Id);
-                }
-            }
-            else
-            {
-                Console.WriteLine("You have zero invitations");
-            }
         }
 
         private async Task OpenInvitationPage()
         {
-            if (!_session.IsUserLoggedIn)
-            {
-                Console.WriteLine("\nError: not logged in\n\n");
-                return;
-            }
 
             Console.WriteLine("Enter a nickname of user or 'exit'");
 
-            string user = Console.ReadLine();
+            string user = Console.ReadLine().Trim();
 
-            var userToInvite = await _userService.GetUser(userUser => userUser.Nickname == user);
+            string result = await _actions.ActionInviteUser(_session, user);
+            Console.WriteLine($"\n{result}\n");
 
-            Thread.Sleep(1000);
-            // var userToInvite = _userService.GetUser(user);
-
-            if (userToInvite is not null)
-            {
-                _usersInvitationService.AddUser(userToInvite.Id, _session.CurrentRoom.Id);
-                _emailService.SendingEmailOnInviting(userToInvite, _session.CurrentRoom.RoomName);
-            }
-            else
-            {
-                Console.WriteLine("This user is not existing");
-            }
             // string pageContent = String.Empty;
             //
             // if (_session.IsUserLoggedIn)

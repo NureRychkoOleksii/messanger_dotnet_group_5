@@ -52,11 +52,6 @@ namespace DAL.Services
             }
         }
 
-        public void CreateTransaction()
-        {
-            _transaction = (DbContextTransaction)_context.Database.BeginTransaction();
-        }
-
     public GenericRepository<RoomUsers> RoomUsersRepository
     {
         get
