@@ -17,5 +17,7 @@ namespace BLL.Abstractions.Interfaces
         // User GetUser(int id);
         public Task<bool> UserExists(Expression<Func<User, bool>> predicate);
         public Task<IEnumerable<User>> GetUser(Expression<Func<User, bool>> predicate);
+        public Task<string> CheckRegisterData(string nickname, string password, string confirmPassword,
+            string email);
     }
 }

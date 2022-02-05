@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using BLL.Abstractions.Interfaces;
 using Core;
@@ -22,6 +23,7 @@ namespace BLL.Services
             _roomService = roomService;
         }
         
+        
         public async Task<bool> CreateChat(Chat chat, Room room)
         {
             if (!(await this.ChatExists(chat, room)))
@@ -30,7 +32,7 @@ namespace BLL.Services
             
                 try
                 {
-                    await _unitOfWork.ChatRepository.Insert(chat);
+                    await Task.Run(() => _unitOfWork.ChatRepository.Insert(chat));
 
                     await _unitOfWork.SaveAsync();
                 
@@ -89,6 +91,7 @@ namespace BLL.Services
             }
         }
         
+        
         public async Task<IEnumerable<Chat>> GetChats(Room room)
         {
             IEnumerable<Chat> users = null;
@@ -127,11 +130,11 @@ namespace BLL.Services
         
             return false;
         }
-        
+
         public async Task<Chat> GetChat(string chatName, Room room)
         {
             var chatsAsync = await this.GetChats(room);
-                
+            
             var chats = chatsAsync.Where(chat => chat.Name == chatName)
                 .FirstOrDefault();
             return chats;

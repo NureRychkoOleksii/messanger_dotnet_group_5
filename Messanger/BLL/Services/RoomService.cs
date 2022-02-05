@@ -24,11 +24,12 @@ namespace BLL.Services
         
         public async void CreateRoom(Room room)
         {
+
             _unitOfWork.CreateTransaction();
             
             try
             {
-                await _unitOfWork.RoomRepository.Insert(room);
+                await Task.Run(() => _unitOfWork.RoomRepository.Insert(room));
 
                 await _unitOfWork.SaveAsync();
                 
@@ -174,6 +175,7 @@ namespace BLL.Services
         //         .FirstOrDefault();
         // }
         //
+        
         public async Task<bool> RoomExists(string name)
         {
             IEnumerable<Room> rooms = null;
@@ -202,66 +204,65 @@ namespace BLL.Services
             }
 
             return rooms.FirstOrDefault() != null;
+        }
 
-        }
-        
-        public bool CreateRole(string roleName, Room room)
-        {
-            Role newRole = new Role() {RoleName = roleName};
-        
-            IList<string> roleNames = new List<string>();
-        
-            foreach (Role role in room.Roles.Values)
-            {
-                roleNames.Add(role.RoleName);
-            }
-            
-            if (!roleNames.Contains(roleName))
-            {
-                int roleId = room.Roles.Keys.Last();
-                room.Roles.Add(++roleId, newRole);
-                this.UpdateRoom(room);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        
-        public bool DeleteRole(string roleName, Room room)
-        {
-            IList<string> roleNames = new List<string>();
-        
-            foreach (Role role in room.Roles.Values)
-            {
-                roleNames.Add(role.RoleName);
-            }
-            
-            if (roleNames.Contains(roleName) && roleName != "User" 
-                && roleName != "Admin")
-            {
-                int roleId = room.Roles.Keys.Where(key => room.Roles[key].RoleName == roleName).FirstOrDefault();
-                room.Roles.Remove(roleId);
-                this.UpdateRoom(room);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        
-        public IEnumerable<Role> GetAllRoles(Room room)
-        {
-            IList<Role> roles = new List<Role>();
-            foreach(Role role in room.Roles.Values)
-            {
-                roles.Add(role);
-            }
-        
-            return roles;
-        }
+        // public bool CreateRole(string roleName, Room room)
+        // {
+        //     Role newRole = new Role() {RoleName = roleName};
+        //
+        //     IList<string> roleNames = new List<string>();
+        //
+        //     foreach (Role role in room.Roles.Values)
+        //     {
+        //         roleNames.Add(role.RoleName);
+        //     }
+        //     
+        //     if (!roleNames.Contains(roleName))
+        //     {
+        //         int roleId = room.Roles.Keys.Last();
+        //         room.Roles.Add(++roleId, newRole);
+        //         this.UpdateRoom(room);
+        //         return true;
+        //     }
+        //     else
+        //     {
+        //         return false;
+        //     }
+        // }
+        //
+        // public bool DeleteRole(string roleName, Room room)
+        // {
+        //     IList<string> roleNames = new List<string>();
+        //
+        //     foreach (Role role in room.Roles.Values)
+        //     {
+        //         roleNames.Add(role.RoleName);
+        //     }
+        //     
+        //     if (roleNames.Contains(roleName) && roleName != "User" 
+        //         && roleName != "Admin")
+        //     {
+        //         int roleId = room.Roles.Keys.Where(key => room.Roles[key].RoleName == roleName).FirstOrDefault();
+        //         room.Roles.Remove(roleId);
+        //         this.UpdateRoom(room);
+        //         return true;
+        //     }
+        //     else
+        //     {
+        //         return false;
+        //     }
+        // }
+        //
+        // public IEnumerable<Role> GetAllRoles(Room room)
+        // {
+        //     IList<Role> roles = new List<Role>();
+        //     foreach(Role role in room.Roles.Values)
+        //     {
+        //         roles.Add(role);
+        //     }
+        //
+        //     return roles;
+        // }
         
     }
 }

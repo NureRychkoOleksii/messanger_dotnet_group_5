@@ -25,33 +25,30 @@ namespace BLL.Services
 
         public async void CreateUser(User user)
         {
-            var condition = await CheckRegisterData(user.Nickname, user.Password, user.Email);
+
+            _unitOfWork.CreateTransaction();
             
-            if (condition)
+            try
             {
-                _unitOfWork.CreateTransaction();
-            
+                await _unitOfWork.UserRepository.Insert(user);
+
+                await _unitOfWork.SaveAsync();
+                
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
                 try
                 {
-                    await _unitOfWork.UserRepository.Insert(user);
-
-                    await _unitOfWork.SaveAsync();
-                
-                    _unitOfWork.Commit();
-                
+                    _unitOfWork.RollBack();
                 }
-                catch (Exception e)
+                catch(Exception e1)
                 {
-                    try
-                    {
-                        _unitOfWork.RollBack();
-                    }
-                    catch(Exception e1)
-                    {
                     
-                    }
                 }
             }
+            
         }
 
         public async void DeleteUser(User user)
@@ -213,7 +210,8 @@ namespace BLL.Services
             
         }
         
-        private async Task<bool> CheckRegisterData (string nickname, string password, string email)
+        public async Task<string> CheckRegisterData (string nickname, string password, string confirmPassword, 
+            string email)
         {
             var users = await this.GetUsers();
             var userName = users.Where(user => user.Nickname == nickname).FirstOrDefault();
@@ -221,22 +219,23 @@ namespace BLL.Services
             string checkEmail = new string( @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
             if (userName != null || String.IsNullOrEmpty(nickname))
             {
-                Console.WriteLine("The given nickname is not unique.\n");
-                return false;
+                return Status.UserNameNotUnique;
             }
             else if (!Regex.IsMatch(email, checkEmail))
             {
-                Console.WriteLine("Invalid email.\n");
-                return false;
+                return Status.InvalidEmail;
             }
             else if (!Regex.IsMatch(password, checkPassword))
             {
-                Console.WriteLine("Invalid password.\n");
-                return false;
+                return Status.InvalidPassword;
+            }
+            else if (!password.Equals(confirmPassword))
+            {
+                return Status.PasswordsNotMatch;
             }
             else
             {
-                return true;
+                return Status.StatusOk;
             }
         }
     }

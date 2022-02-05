@@ -2,13 +2,14 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BLL.Abstractions;
 using Core;
 using Core.Models;
 using BLL.Abstractions.Interfaces;
 
 namespace BLL
 {
-    public class Session
+    public class Session : ISession
     {
         private readonly IUserService _userService;
         private readonly IRoomService _roomService;
@@ -97,8 +98,7 @@ namespace BLL
             if (chatToEnter == null)
             {
                 return false;
-            }
-        
+            } 
             var chatsAsync = await _chatService.GetChats(_currentRoom);
             var chats = chatsAsync.Where(chat => chat.Name == chatToEnter.Name)
                 .FirstOrDefault();

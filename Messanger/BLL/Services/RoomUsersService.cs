@@ -194,7 +194,7 @@ namespace BLL.Services
             int roleId = rooms.FirstOrDefault().RoomId;
             Role role = room.Roles[roleId];
             return role;
-
+            
         }
         
         // public async Task<Role> GetUserRole(User user, Room room)
@@ -256,7 +256,6 @@ namespace BLL.Services
         //     
         //     return userRole;
         // }
-        
         
         
         public async Task<IEnumerable<Room>> GetRoomsOfUser(User user)
