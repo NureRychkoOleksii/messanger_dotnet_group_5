@@ -2,50 +2,165 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BLL.Abstractions.Interfaces;
 using Core;
 using DAL.Abstractions.Interfaces;
+using DAL.Services;
 
 namespace BLL.Services
 {
     public class UserService : IUserService
     {
-        private readonly IRepository<User> _repository;
+        private readonly IGenericRepository<User> _genericRepository;
 
-        public UserService(IRepository<User> repository)
+        private readonly UnitOfWork _unitOfWork = new UnitOfWork();
+
+        public UserService(IGenericRepository<User> repository)
         {
-            _repository = repository;
+            _genericRepository = repository;
         }
 
         public async void CreateUser(User user)
         {
-            await _repository.CreateObjectAsync(user);
+
+            _unitOfWork.CreateTransaction();
+            
+            try
+            {
+                await _unitOfWork.UserRepository.Insert(user);
+
+                await _unitOfWork.SaveAsync();
+                
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    _unitOfWork.RollBack();
+                }
+                catch(Exception e1)
+                {
+                    
+                }
+            }
+            
         }
 
         public async void DeleteUser(User user)
         {
-            await _repository.DeleteObjectAsync(user);
+            _unitOfWork.CreateTransaction();
+            
+            try
+            {
+                _unitOfWork.UserRepository.Delete(user);
+
+                await _unitOfWork.SaveAsync();
+                
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    _unitOfWork.RollBack();
+                }
+                catch(Exception e1)
+                {
+                    
+                }
+            }
         }
 
         public async void UpdateUser(User user)
         {
-            await _repository.UpdateObjectAsync(user);
+            _unitOfWork.CreateTransaction();
+            
+            try
+            {
+                _unitOfWork.UserRepository.Update(user);
+
+                await _unitOfWork.SaveAsync();
+                
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    _unitOfWork.RollBack();
+                }
+                catch(Exception e1)
+                {
+                    
+                }
+            }
         }
 
         public async Task<IEnumerable<User>> GetUsers()
         {
-            var users = await _repository.GetAllAsync(typeof(User));
+            IEnumerable<User> users = null;
+            
+            _unitOfWork.CreateTransaction();
+            
+            try
+            {
+                users = await _unitOfWork.UserRepository.Get();
+
+                //await _unitOfWork.SaveAsync();
+                
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    _unitOfWork.RollBack();
+                }
+                catch(Exception e1)
+                {
+                    
+                }
+            }
 
             return users;
         }
 
-        public async Task<User> GetUser(Func<User,bool> func)
+        public async Task<IEnumerable<User>> GetUser(Expression<Func<User,bool>> predicate)
         {
-           var users =  await _repository.GetAllAsync(typeof(User));
-               
-           return users.Where(func).FirstOrDefault();
+            IEnumerable<User> user = null;
+            
+            _unitOfWork.CreateTransaction();
+            
+            try
+            {
+                user = await _unitOfWork.UserRepository.Get(predicate);
+
+                //await _unitOfWork.SaveAsync();
+                
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    _unitOfWork.RollBack();
+                }
+                catch(Exception e1)
+                {
+                    
+                }
+            }
+
+            return user;
         }
         
         // public User GetUser(string username)
@@ -64,11 +179,35 @@ namespace BLL.Services
         //         .FirstOrDefault();
         // }
         // 
-        public async Task<bool> UserExists(Func<User, bool> func)
+        public async Task<bool> UserExists(Expression<Func<User, bool>> predicate)
         {
-            var user =  await _repository.GetAllAsync(typeof(User));
+            IEnumerable<User> user = null;
             
-            return user.Where(func).FirstOrDefault() != null;
+            _unitOfWork.CreateTransaction();
+            
+            try
+            {
+                user = await _unitOfWork.UserRepository.Get(predicate);
+
+               // await _unitOfWork.SaveAsync();
+                
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    _unitOfWork.RollBack();
+                }
+                catch(Exception e1)
+                {
+                    
+                }
+            }
+
+            return user.FirstOrDefault() != null;
+            
         }
         
         public async Task<string> CheckRegisterData (string nickname, string password, string confirmPassword, 

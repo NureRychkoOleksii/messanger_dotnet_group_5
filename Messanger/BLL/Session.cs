@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using BLL.Abstractions;
 using Core;
@@ -97,13 +98,12 @@ namespace BLL
             if (chatToEnter == null)
             {
                 return false;
-            }
-
-            var chats = await _chatService.GetChats(_currentRoom);
-            var chat = chats.Where(chat => chat.Name == chatToEnter.Name)
+            } 
+            var chatsAsync = await _chatService.GetChats(_currentRoom);
+            var chats = chatsAsync.Where(chat => chat.Name == chatToEnter.Name)
                 .FirstOrDefault();
-
-            if (chat != null)
+        
+            if (chats != null)
             {
                 _currentChat = chatToEnter;
                 return true;

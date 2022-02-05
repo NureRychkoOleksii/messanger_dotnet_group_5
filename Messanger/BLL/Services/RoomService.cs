@@ -1,59 +1,172 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using BLL.Abstractions.Interfaces;
 using Core;
 using DAL.Abstractions.Interfaces;
+using DAL.Services;
 
 namespace BLL.Services
 {
     public class RoomService : IRoomService
     {
-        private readonly IRepository<Room> _repository;
+        private readonly IGenericRepository<Room> _repository;
+
+        private readonly UnitOfWork _unitOfWork = new UnitOfWork();
         
-        public RoomService(IRepository<Room> repository)
+        public RoomService(IGenericRepository<Room> repository)
         {
             _repository = repository;
         }
         
         public async void CreateRoom(Room room)
         {
-            await Task.Run(() => _repository.CreateObjectAsync(room));
-        }
 
+            _unitOfWork.CreateTransaction();
+            
+            try
+            {
+                await Task.Run(() => _unitOfWork.RoomRepository.Insert(room));
+
+                await _unitOfWork.SaveAsync();
+                
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    _unitOfWork.RollBack();
+                }
+                catch(Exception e1)
+                {
+                    
+                }
+            }
+        }
+        
         public async void DeleteRoom(Room room)
         {
-            await _repository.DeleteObjectAsync(room);
-        }
+            _unitOfWork.CreateTransaction();
+            
+            try
+            {
+                _unitOfWork.RoomRepository.Delete(room);
 
+                await _unitOfWork.SaveAsync();
+                
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    _unitOfWork.RollBack();
+                }
+                catch(Exception e1)
+                {
+                    
+                }
+            }
+        }
+        
         public async void UpdateRoom(Room room)
         {
-            await _repository.UpdateObjectAsync(room);
-        }
+            _unitOfWork.CreateTransaction();
+            
+            try
+            {
+                _unitOfWork.RoomRepository.Update(room);
 
+                await _unitOfWork.SaveAsync();
+                
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    _unitOfWork.RollBack();
+                }
+                catch(Exception e1)
+                {
+                    
+                }
+            }
+        }
+        
         public async Task<IEnumerable<Room>> GetRooms()
         {
-            var rooms = await _repository.GetAllAsync(typeof(Room));
+            IEnumerable<Room> rooms = null;
+            _unitOfWork.CreateTransaction();
+            
+            try
+            {
+                rooms = await _unitOfWork.RoomRepository.Get();
+
+                //await _unitOfWork.SaveAsync();
+                
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    _unitOfWork.RollBack();
+                }
+                catch(Exception e1)
+                {
+                    
+                }
+            }
 
             return rooms;
         }
-
-        public async Task<Room> GetRoom(Func<Room, bool> func)
+        
+        public async Task<IEnumerable<Room>> GetRoom(Expression<Func<Room, bool>> predicate)
         {
-            var rooms = await _repository
-                .GetAllAsync(typeof(Room));
+            IEnumerable<Room> rooms = null;
+            
+            _unitOfWork.CreateTransaction();
+            
+            try
+            {
+                rooms = await _unitOfWork.RoomRepository.Get(predicate);
                 
-            return  rooms.Where(func).FirstOrDefault();
-        }
+                await _unitOfWork.SaveAsync();
+                
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    _unitOfWork.RollBack();
+                }
+                catch(Exception e1)
+                {
+                    
+                }
+            }
 
+            return rooms;
+        }
+        
         // public async Task<Room> GetRoom(string roomName)
         // {
         //     var rooms = await _repository.GetAllAsync(typeof(Room));
         //
         //     return rooms.Where(room => room.RoomName == roomName).FirstOrDefault();
         // }
-
+        
         // public Room GetRoom(int id)
         // {
         //     return _repository
@@ -62,12 +175,35 @@ namespace BLL.Services
         //         .FirstOrDefault();
         // }
         //
+        
         public async Task<bool> RoomExists(string name)
         {
-            var rooms = await _repository
-                .GetAllAsync(typeof(Room));
+            IEnumerable<Room> rooms = null;
+            
+            _unitOfWork.CreateTransaction();
+            
+            try
+            {
+                rooms = await _unitOfWork.RoomRepository.Get(x => x.RoomName == name);
+
+                await _unitOfWork.SaveAsync();
                 
-            return rooms.Where(room => room.RoomName == name).FirstOrDefault() != null;
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    _unitOfWork.RollBack();
+                }
+                catch(Exception e1)
+                {
+                    
+                }
+            }
+
+            return rooms.FirstOrDefault() != null;
         }
 
         // public bool CreateRole(string roleName, Room room)

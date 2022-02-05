@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,35 +7,105 @@ using BLL.Abstractions.Interfaces;
 using Core;
 using Core.Models;
 using DAL.Abstractions.Interfaces;
+using DAL.Services;
 
 namespace BLL.Services
 {
     public class UserInvitationService : IUsersInvitationService
     {
-        private readonly IRepository<UsersInvitation> _repository;
+        private readonly IGenericRepository<UsersInvitation> _repository;
 
-        public UserInvitationService(IRepository<UsersInvitation> repository)
+        private readonly UnitOfWork _unitOfWork = new UnitOfWork();
+        
+        public UserInvitationService(IGenericRepository<UsersInvitation> repository)
         {
             _repository = repository;
         }
-
+        
         public async void AddUser(int userId, int roomId)
         {
-            var user = new UsersInvitation() {RoomId = roomId, UserId = userId, Id = 0};
+            var user = new UsersInvitation() {RoomId = roomId, UserId = userId,};
             
-            await _repository.CreateObjectAsync(user);
-        }
+            _unitOfWork.CreateTransaction();
+            
+            try
+            {
+                await _unitOfWork.UserInvitationRepository.Insert(user);
 
-        public void RemoveUser(int userId, int roomId)
+                await _unitOfWork.SaveAsync();
+                
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    _unitOfWork.RollBack();
+                }
+                catch(Exception e1)
+                {
+                    
+                }
+            }
+        }
+        
+        public async void RemoveUser(int userId, int roomId)
         {
             var user = new UsersInvitation() {UserId = userId, RoomId = roomId};
+        
+            _unitOfWork.CreateTransaction();
+            
+            try
+            {
+                _unitOfWork.UserInvitationRepository.Delete(user);
 
-            _repository.DeleteObjectAsync(user);
+                await _unitOfWork.SaveAsync();
+                
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    _unitOfWork.RollBack();
+                }
+                catch(Exception e1)
+                {
+                    
+                }
+            }
         }
-
+        
         public async Task<IEnumerable<UsersInvitation>> GetUsers()
         {
-            return await _repository.GetAllAsync(typeof(UsersInvitation));
+            IEnumerable<UsersInvitation> users = null;
+            
+            _unitOfWork.CreateTransaction();
+            
+            try
+            {
+                users = await _unitOfWork.UserInvitationRepository.Get();
+
+                await _unitOfWork.SaveAsync();
+                
+                _unitOfWork.Commit();
+                
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    _unitOfWork.RollBack();
+                }
+                catch(Exception e1)
+                {
+                    
+                }
+            }
+
+            return users;
         }
     }
 }

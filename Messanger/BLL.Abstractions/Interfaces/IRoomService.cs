@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Core;
 
@@ -11,7 +12,7 @@ namespace BLL.Abstractions.Interfaces
         void DeleteRoom(Room room);
         void UpdateRoom(Room room);
         public Task<IEnumerable<Room>> GetRooms();
-        public Task<Room> GetRoom(Func<Room, bool> func);
+        public Task<IEnumerable<Room>> GetRoom(Expression<Func<Room, bool>> predicate);
         public Task<bool> RoomExists(string name);
         // bool CreateRole(string roleName, Room room);
         // Task<Room> GetRoom(string roomName);

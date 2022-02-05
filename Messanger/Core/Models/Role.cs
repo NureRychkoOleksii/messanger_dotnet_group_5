@@ -7,6 +7,8 @@ namespace Core
 {
     public class Role : IdKey
     {
+        public int RoleId { get; set; }
+        
         public string RoleName;
 
         public bool ManageRoles = false;

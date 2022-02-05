@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Core;
+using DAL.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,8 +11,49 @@ namespace Messanger
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
+            // var unitOfWork = new UnitOfWork();
+            //
+            // unitOfWork.CreateTransaction();
+            //
+            // try
+            // {
+            //     await unitOfWork.UserRepository.Insert(new User()
+            //     {
+            //         Email = "oleksii.rychko@nure.ua",
+            //         Nickname = "Lexa",
+            //         Password = "12341234a!",
+            //     });
+            //     
+            //     await unitOfWork.SaveAsync();
+            //     
+            //     unitOfWork.Commit();
+            //     
+            // }
+            // catch (Exception e)
+            // {
+            //     Console.WriteLine("Lol");
+            //     unitOfWork.RollBack();
+            // }
+            // finally
+            // {
+            //     unitOfWork.Dispose();
+            // }
+
+
+            // var user = await unitOfWork.UserRepository.Get();
+            //
+            // if (user != null)
+            // {
+            //     var firstOrDefault = user.FirstOrDefault();
+            //     Console.WriteLine(firstOrDefault.Id);
+            //     Console.WriteLine(firstOrDefault.Nickname);
+            //     Console.WriteLine(firstOrDefault.Password);
+            //     Console.WriteLine(firstOrDefault.Email);
+            // }
+            // Console.WriteLine();
+
             var services = new ServiceCollection();
             ConfigureServices(services);
             var serviceProvider = services.BuildServiceProvider();

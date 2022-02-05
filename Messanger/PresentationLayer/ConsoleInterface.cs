@@ -87,15 +87,15 @@ namespace Messanger
                 case "exit room":
                     OpenExitRoomPage();
                     break;
-                case "create role":
-                    //OpenCreateRolePage();
-                    break;
-                case "delete role":
-                    //OpenDeleteRolePage();
-                    break;
-                case "view roles":
-                    //OpenViewRolesPage();
-                    break;
+                // case "create role":
+                //     OpenCreateRolePage();
+                //     break;
+                // case "delete role":
+                //     OpenDeleteRolePage();
+                //     break;
+                // case "view roles":
+                //     OpenViewRolesPage();
+                //     break;
                 case "invite user":
                     OpenInvitationPage();
                     break;
@@ -145,7 +145,7 @@ namespace Messanger
 
             Console.WriteLine("Enter a nickname of user or 'exit'");
 
-            string user = Console.ReadLine();
+            string user = Console.ReadLine().Trim();
 
             string result = await _actions.ActionInviteUser(_session, user);
             Console.WriteLine($"\n{result}\n");
@@ -318,7 +318,6 @@ namespace Messanger
 
             Thread.Sleep(1000);
 
-            //Room rooms = _roomService.GetRooms().ToList().LastOrDefault();
             OpenMainPage();
         }
 
@@ -345,7 +344,7 @@ namespace Messanger
             string pageContent;
             Console.Write("Enter the name of the room: ");
             string roomName = Console.ReadLine().Trim();
-
+          
             // update room name
             // delete room
             // remove users
@@ -418,7 +417,8 @@ namespace Messanger
             Console.WriteLine(pageContent);
         }
 
-        // public void OpenCreateRolePage()
+
+        // public async void OpenCreateRolePage()
         // {
         //     if (!_session.IsUserLoggedIn)
         //     {
@@ -426,7 +426,7 @@ namespace Messanger
         //         return;
         //     }
         //
-        //     Role userRole = _roomUsersService.GetUserRole(_session.CurrentUser, _session.CurrentRoom, out int roleId);
+        //     Role userRole = await _roomUsersService.GetUserRole(_session.CurrentUser, _session.CurrentRoom);
         //     string pageContent = string.Concat(
         //         "\nGo to:\n\n",
         //         "view users\n",
@@ -469,7 +469,7 @@ namespace Messanger
         //     
         //     Console.WriteLine(pageContent);
         // }
-        //
+
         // public void OpenDeleteRolePage()
         // {
         //     if (!_session.IsUserLoggedIn)
@@ -513,7 +513,7 @@ namespace Messanger
         //     
         //     Console.WriteLine(pageContent);
         // }
-        //
+
         // public void OpenViewRolesPage()
         // {
         //     if (!_session.IsUserLoggedIn)
@@ -671,22 +671,9 @@ namespace Messanger
             string pageContent;
             Console.Write("Enter the name of the new chat: ");
             string newChatName = Console.ReadLine().Trim();
-
-            // while (String.IsNullOrEmpty(newChatName))
-            // {
-            //     Console.WriteLine("Chat name can not be empty.");
-            //     Console.Write("Enter the name of the new chat: ");
-            //     newChatName = Console.ReadLine().Trim();
-            // }
                 
             Console.Write("Is the chat private? (yes or anything else): ");
             string isPrivate = Console.ReadLine().Trim().ToLower();
-                
-            // while (!isPrivate.Equals("yes") && !isPrivate.Equals("no"))
-            // {
-            //     Console.WriteLine("Wrong. Type \"yes\" or \"no\" ");
-            //     isPrivate = Console.ReadLine().Trim();
-            // }
 
             string result = await _actions.ActionCreateChat(_session, newChatName, isPrivate, _session.CurrentRoom.Id);
             Console.WriteLine($"\n{result}\n");
@@ -826,6 +813,7 @@ namespace Messanger
             //     );
             // }
         }
+
 
         public async void OpenExitChatPage()
         {
