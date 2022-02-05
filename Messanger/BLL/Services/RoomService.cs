@@ -138,7 +138,7 @@ namespace BLL.Services
             try
             {
                 rooms = await _unitOfWork.RoomRepository.Get(predicate);
-
+                
                 await _unitOfWork.SaveAsync();
                 
                 _unitOfWork.Commit();

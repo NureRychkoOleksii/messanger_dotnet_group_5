@@ -296,6 +296,7 @@ namespace Messanger
                     Console.WriteLine($"Name {username} is already taken");
                     Console.Write("Username: ");
                     username = Console.ReadLine().Trim();
+                    condition = await _userService.UserExists(x => x.Nickname == username);
                 }
 
                 //Console.Write("Email: ");
@@ -449,7 +450,6 @@ namespace Messanger
 
             var roomUsers = await _roomUsersService.GetRoomsOfUser(_session.CurrentUser);
             
-            Thread.Sleep(500);
 
             Console.WriteLine();
             if (roomUsers.Count() > 0)

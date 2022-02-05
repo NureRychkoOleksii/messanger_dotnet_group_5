@@ -290,7 +290,8 @@ namespace BLL.Services
         
             foreach(RoomUsers roomUser in roomUsers)
             {
-                var room = await _roomService.GetRoom(user => user.Id == roomUser.Id);
+                var allRooms = await _roomService.GetRooms();
+                var room = allRooms.Where(user => user.Id == roomUser.RoomId);
                 rooms.Add(room.FirstOrDefault());
             }
             
@@ -315,7 +316,14 @@ namespace BLL.Services
             }
             catch (Exception e)
             {
-                _unitOfWork.RollBack();
+                try
+                {
+                    _unitOfWork.RollBack();
+                }
+                catch (Exception e1)
+                {
+                    
+                }
             }
 
             List<User> users = new List<User>();

@@ -209,7 +209,7 @@ namespace BLL.Services
                 }
             }
 
-            return user != null;
+            return user.FirstOrDefault() != null;
             
         }
         
