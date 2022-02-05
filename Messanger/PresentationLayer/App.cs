@@ -1,5 +1,6 @@
 ﻿using BLL.Abstractions.Interfaces;
 using Core;
+using System.Threading.Tasks;
 
 namespace Messanger
 {
@@ -14,9 +15,9 @@ namespace Messanger
             _consoleInterface = consoleInterface;
         }
 
-        public void StartApp()
+        public async Task StartApp()
         {
-            _consoleInterface.Start();
+            await _consoleInterface.Start();
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Messanger
             //     Password = "1234",
             // });
             // await unitOfWork.Save();
-            
+
             // var user = await unitOfWork.UserRepository.Get();
             //
             // if (user != null)
@@ -35,10 +35,10 @@ namespace Messanger
             // }
             // Console.WriteLine();
 
-            // var services = new ServiceCollection();
-            // ConfigureServices(services);
-            // var serviceProvider = services.BuildServiceProvider();
-            // serviceProvider.GetService<App>().StartApp();
+            var services = new ServiceCollection();
+            ConfigureServices(services);
+            var serviceProvider = services.BuildServiceProvider();
+            await serviceProvider.GetService<App>().StartApp();
         }
 
         private static void ConfigureServices(IServiceCollection services)

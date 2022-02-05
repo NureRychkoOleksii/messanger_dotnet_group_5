@@ -5,85 +5,87 @@ using DAL.DataBase;
 using System.Data.Entity;
 using DAL.Abstractions.Interfaces;
 
-namespace DAL.Services;
-
-public class UnitOfWork : IDisposable, IUnitOfWork
+namespace DAL.Services
 {
-    private readonly DALContext _context;
-    private DbContextTransaction _transaction;
-    private GenericRepository<User> userRepository;
-    private GenericRepository<Room> roomRepository;
-    private bool _disposed = false;
 
-    public UnitOfWork(DALContext context)
+    public class UnitOfWork : IDisposable, IUnitOfWork
     {
-        this._context = context;
-    }
-    
-    public GenericRepository<User> UserRepository
-    {
-        get
+        private readonly DALContext _context;
+        private DbContextTransaction _transaction;
+        private GenericRepository<User> userRepository;
+        private GenericRepository<Room> roomRepository;
+        private bool _disposed = false;
+
+        public UnitOfWork(DALContext context)
         {
-            if (this.userRepository == null)
-            {
-                this.userRepository = new GenericRepository<User>(_context);
-            }
-
-            return this.userRepository;
+            this._context = context;
         }
-    }
 
-    public GenericRepository<Room> RoomRepository
-    {
-        get
+        public GenericRepository<User> UserRepository
         {
-            if (this.roomRepository == null)
+            get
             {
-                this.roomRepository = new GenericRepository<Room>(_context);
-            }
+                if (this.userRepository == null)
+                {
+                    this.userRepository = new GenericRepository<User>(_context);
+                }
 
-            return this.roomRepository;
-        }
-    }
-
-    public void CreateTransaction()
-    {
-        _transaction = (DbContextTransaction) _context.Database.BeginTransaction();
-    }
-
-    public void RollBack()
-    {
-        _transaction.Rollback();
-        _transaction.Dispose();
-        
-    }
-
-    public void Commit()
-    {
-        _transaction.Commit();
-    }
-    
-    public async Task SaveAsync()
-    {
-        await _context.SaveChangesAsync();
-    }
-
-    private async Task Dispose(bool disposing)
-    {
-        if (!this._disposed)
-        {
-            if (disposing)
-            {
-                await _context.DisposeAsync();
+                return this.userRepository;
             }
         }
 
-        this._disposed = true;
-    }
-    
-    public async void Dispose()
-    {
-        await this.Dispose(true);
-        GC.SuppressFinalize(this);
+        public GenericRepository<Room> RoomRepository
+        {
+            get
+            {
+                if (this.roomRepository == null)
+                {
+                    this.roomRepository = new GenericRepository<Room>(_context);
+                }
+
+                return this.roomRepository;
+            }
+        }
+
+        public void CreateTransaction()
+        {
+            _transaction = (DbContextTransaction)_context.Database.BeginTransaction();
+        }
+
+        public void RollBack()
+        {
+            _transaction.Rollback();
+            _transaction.Dispose();
+
+        }
+
+        public void Commit()
+        {
+            _transaction.Commit();
+        }
+
+        public async Task SaveAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task Dispose(bool disposing)
+        {
+            if (!this._disposed)
+            {
+                if (disposing)
+                {
+                    await _context.DisposeAsync();
+                }
+            }
+
+            this._disposed = true;
+        }
+
+        public async void Dispose()
+        {
+            await this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

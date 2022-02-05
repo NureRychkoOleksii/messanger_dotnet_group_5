@@ -36,6 +36,7 @@
       <ProjectReference Include="..\BLL\BLL.csproj" />
       <ProjectReference Include="..\DAL.Abstractions\DAL.Abstractions.csproj" />
       <ProjectReference Include="..\DAL\DAL.csproj" />
+      <ProjectReference Include="..\PL.Abstractions\PL.Abstractions.csproj" />
     </ItemGroup>
 
 </Project>

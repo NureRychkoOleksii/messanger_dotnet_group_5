@@ -1,18 +1,20 @@
 using System.Threading.Tasks;
 
-namespace DAL.Abstractions.Interfaces;
-
-public interface IUnitOfWork
+namespace DAL.Abstractions.Interfaces
 {
-    void CreateTransaction();
 
-    void RollBack();
+    public interface IUnitOfWork
+    {
+        void CreateTransaction();
 
-    void Commit();
+        void RollBack();
 
-    Task SaveAsync();
+        void Commit();
 
-    //Task Dispose(bool disposing);
+        Task SaveAsync();
 
-    void Dispose();
+        //Task Dispose(bool disposing);
+
+        void Dispose();
+    }
 }
