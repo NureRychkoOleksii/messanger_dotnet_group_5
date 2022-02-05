@@ -1,8 +1,10 @@
 using System.Threading.Tasks;
 using Core;
-namespace DAL.Abstractions.Interfaces;
 
-public interface IUnitOfWork
+namespace DAL.Abstractions.Interfaces
+{
+
+   public interface IUnitOfWork
 {
     // public GenericRepository<User> UserRepository { get; }
     //
@@ -10,13 +12,14 @@ public interface IUnitOfWork
 
     void CreateTransaction();
 
-    void RollBack();
+        void RollBack();
 
-    void Commit();
+        void Commit();
 
-    Task SaveAsync();
+        Task SaveAsync();
 
-    //Task Dispose(bool disposing);
+        //Task Dispose(bool disposing);
 
-    void Dispose();
+        void Dispose();
+    }
 }

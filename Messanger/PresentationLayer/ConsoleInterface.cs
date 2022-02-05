@@ -12,6 +12,8 @@ using BLL;
 using BLL.Abstractions.Interfaces;
 using Core;
 using Core.Models;
+using PL.Abstractions.Interfaces;
+using PL.Commands;
 
 namespace Messanger
 {
@@ -26,6 +28,8 @@ namespace Messanger
         private readonly IChatService _chatService;
         private readonly Actions _actions;
 
+        private Dictionary<string, GenericCommand<string>> _actionPageMap = new Dictionary<string, GenericCommand<string>>();
+
         public ConsoleInterface(Session session, IUserService userService, IRoomService roomService,
             IRoomUsersService roomUsersService, IEmailService emailService, 
             IUsersInvitationService usersInvitationService, IChatService chatService, Actions actions)
@@ -38,21 +42,21 @@ namespace Messanger
             _usersInvitationService = usersInvitationService;
             _chatService = chatService;
             _actions = actions;
+
+            InitActionPageMap();
         }
 
-        public void Start()
+        public async Task Start()
         {
             string action = "start";
 
             while (!action.Equals("exit"))
             {
-                ResolveAction(action);
-                
+                await ResolveActionAsync(action);
                 Console.Write("Choose one option: ");
                 action = Console.ReadLine();
             }
         }
-
         private void ResolveAction(string action)
         {
             switch (action.Trim().ToLower())
@@ -317,12 +321,60 @@ namespace Messanger
             Console.WriteLine(result);
 
             Thread.Sleep(1000);
+        }
+      
+        private void InitActionPageMap()
+        {
+            MainPagesCommand mainPagesCommand = new MainPagesCommand(_session);
+            AuthenticationCommand authenticationCommand = new AuthenticationCommand(_session, _userService, _emailService);
+            RoomsCommand roomsCommand = new RoomsCommand(_session, _roomService, _roomUsersService);
+            RolesCommand rolesCommand = new RolesCommand(_session, _roomService, _roomUsersService);
+            ChatsCommand chatsCommand = new ChatsCommand(_session, _chatService);
+            UserInvitationsCommand userInvitationsCommand = new UserInvitationsCommand(_session, _userService, _roomService,
+                _roomUsersService, _usersInvitationService, _emailService);
 
-            OpenMainPage();
+            _actionPageMap.Add(ConsolePages.StartPage, mainPagesCommand);
+            _actionPageMap.Add(ConsolePages.MainPage, mainPagesCommand);
+
+            _actionPageMap.Add(ConsolePages.LoginPage, authenticationCommand);
+            _actionPageMap.Add(ConsolePages.RegisterPage, authenticationCommand);
+            _actionPageMap.Add(ConsolePages.LogoutPage, authenticationCommand);
+
+            _actionPageMap.Add(ConsolePages.CreateRoomPage, roomsCommand);
+            _actionPageMap.Add(ConsolePages.ViewRoomsPage, roomsCommand);
+            _actionPageMap.Add(ConsolePages.ViewUsersPage, roomsCommand);
+            _actionPageMap.Add(ConsolePages.EnterRoomPage, roomsCommand);
+            _actionPageMap.Add(ConsolePages.ExitRoomPage, roomsCommand);
+            _actionPageMap.Add(ConsolePages.UpdateRoomName, roomsCommand);
+
+            _actionPageMap.Add(ConsolePages.CreateRolePage, rolesCommand);
+            _actionPageMap.Add(ConsolePages.ViewRolesPage, rolesCommand);
+            _actionPageMap.Add(ConsolePages.DeleteRolePage, rolesCommand);
+
+            _actionPageMap.Add(ConsolePages.CreateChatPage, chatsCommand);
+            _actionPageMap.Add(ConsolePages.ViewChatsPage, chatsCommand);
+            _actionPageMap.Add(ConsolePages.EnterRoomPage, chatsCommand);
+            _actionPageMap.Add(ConsolePages.ExitChatPage, chatsCommand);
+
+            _actionPageMap.Add(ConsolePages.InviteUserPage, userInvitationsCommand);
+            _actionPageMap.Add(ConsolePages.MyInvitationsPage, userInvitationsCommand);
         }
 
-        private async void OpenViewUserRooms()
+        private async Task ResolveActionAsync(string action)
         {
+            string trimmedAction = action.Trim().ToLower();
+
+            if (_actionPageMap.ContainsKey(trimmedAction))
+            {
+                await _actionPageMap[trimmedAction].ExecuteAsync(trimmedAction);
+            }
+            else
+            {
+                Console.WriteLine($"\nNo such page {action}\n\n");
+            }
+        }
+      
+        private async void OpenViewUserRooms()
             string pageContent = String.Concat($"\nHello, {_session.CurrentUser.Nickname}!\n",
             "\nGo to:\n\n",
             "enter room\n",

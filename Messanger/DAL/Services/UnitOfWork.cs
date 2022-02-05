@@ -8,11 +8,11 @@ using DAL.Abstractions.Interfaces;
 using Microsoft.EntityFrameworkCore.SqlServer.Storage.Internal;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace DAL.Services;
-
-public class UnitOfWork : IDisposable, IUnitOfWork
+namespace DAL.Services
 {
-    private readonly DALContext _context = new DALContext();
+    public class UnitOfWork : IDisposable, IUnitOfWork
+    {
+        private readonly DALContext _context = new DALContext();
     private IDbContextTransaction _transaction;
     private GenericRepository<User> userRepository;
     private GenericRepository<Room> roomRepository;
@@ -27,30 +27,35 @@ public class UnitOfWork : IDisposable, IUnitOfWork
     // }
     
     public GenericRepository<User> UserRepository
-    {
-        get
         {
-            if (this.userRepository == null)
+            get
             {
-                this.userRepository = new GenericRepository<User>(_context);
+                if (this.userRepository == null)
+                {
+                    this.userRepository = new GenericRepository<User>(_context);
+                }
+
+                return this.userRepository;
             }
-
-            return this.userRepository;
         }
-    }
 
-    public GenericRepository<Room> RoomRepository
-    {
-        get
+        public GenericRepository<Room> RoomRepository
         {
-            if (this.roomRepository == null)
+            get
             {
-                this.roomRepository = new GenericRepository<Room>(_context);
-            }
+                if (this.roomRepository == null)
+                {
+                    this.roomRepository = new GenericRepository<Room>(_context);
+                }
 
-            return this.roomRepository;
+                return this.roomRepository;
+            }
         }
-    }
+
+        public void CreateTransaction()
+        {
+            _transaction = (DbContextTransaction)_context.Database.BeginTransaction();
+        }
 
     public GenericRepository<RoomUsers> RoomUsersRepository
     {
@@ -112,32 +117,33 @@ public class UnitOfWork : IDisposable, IUnitOfWork
         
     }
 
-    public void Commit()
-    {
-        _transaction.Commit();
-    }
-    
-    public async Task SaveAsync()
-    {
-        await _context.SaveChangesAsync();
-    }
-
-    private async Task Dispose(bool disposing)
-    {
-        if (!this._disposed)
+        public void Commit()
         {
-            if (disposing)
-            {
-                await _context.DisposeAsync();
-            }
+            _transaction.Commit();
         }
 
-        this._disposed = true;
-    }
-    
-    public async void Dispose()
-    {
-        await this.Dispose(true);
-        GC.SuppressFinalize(this);
+        public async Task SaveAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task Dispose(bool disposing)
+        {
+            if (!this._disposed)
+            {
+                if (disposing)
+                {
+                    await _context.DisposeAsync();
+                }
+            }
+
+            this._disposed = true;
+        }
+
+        public async void Dispose()
+        {
+            await this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
     }
 }

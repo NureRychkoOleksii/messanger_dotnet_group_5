@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,7 +41,6 @@ namespace Messanger
             //     unitOfWork.Dispose();
             // }
 
-
             // var user = await unitOfWork.UserRepository.Get();
             //
             // if (user != null)
@@ -58,6 +57,7 @@ namespace Messanger
             ConfigureServices(services);
             var serviceProvider = services.BuildServiceProvider();
             serviceProvider.GetService<App>().StartApp();
+            await serviceProvider.GetService<App>().StartApp();
         }
 
         private static void ConfigureServices(IServiceCollection services)

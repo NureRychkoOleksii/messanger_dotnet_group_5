@@ -1,18 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PresentationLayer", "PresentationLayer\PresentationLayer.csproj", "{D22825B3-DCE7-47BF-ADB6-199C34982A14}"
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32106.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PresentationLayer", "PresentationLayer\PresentationLayer.csproj", "{D22825B3-DCE7-47BF-ADB6-199C34982A14}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL", "DAL\DAL.csproj", "{23FF0472-FC52-4F14-8ED5-31B51573A8BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DAL", "DAL\DAL.csproj", "{23FF0472-FC52-4F14-8ED5-31B51573A8BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BLL", "BLL\BLL.csproj", "{B50C7F58-A9F7-45FE-BE82-1FBC972F7136}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BLL", "BLL\BLL.csproj", "{B50C7F58-A9F7-45FE-BE82-1FBC972F7136}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{683DBFC4-8ACE-4E58-A73A-70E793982C32}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{683DBFC4-8ACE-4E58-A73A-70E793982C32}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{15CB0880-BD41-4468-98FA-2146C1C2CA62}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "API\API.csproj", "{15CB0880-BD41-4468-98FA-2146C1C2CA62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BLL.Abstractions", "BLL.Abstractions\BLL.Abstractions.csproj", "{9FF2A078-C231-4C8B-B53F-A3F1F7E6F924}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BLL.Abstractions", "BLL.Abstractions\BLL.Abstractions.csproj", "{9FF2A078-C231-4C8B-B53F-A3F1F7E6F924}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL.Abstractions", "DAL.Abstractions\DAL.Abstractions.csproj", "{6157014B-8D8F-498B-BB55-A0B7CD5A315D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DAL.Abstractions", "DAL.Abstractions\DAL.Abstractions.csproj", "{6157014B-8D8F-498B-BB55-A0B7CD5A315D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PL.Abstractions", "PL.Abstractions\PL.Abstractions.csproj", "{08FE710C-93FE-4D70-AD3F-B4D4151E96E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,5 +53,15 @@ Global
 		{6157014B-8D8F-498B-BB55-A0B7CD5A315D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6157014B-8D8F-498B-BB55-A0B7CD5A315D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6157014B-8D8F-498B-BB55-A0B7CD5A315D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08FE710C-93FE-4D70-AD3F-B4D4151E96E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08FE710C-93FE-4D70-AD3F-B4D4151E96E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08FE710C-93FE-4D70-AD3F-B4D4151E96E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08FE710C-93FE-4D70-AD3F-B4D4151E96E2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9E96FA4C-D640-4ABB-B991-C624347E639E}
 	EndGlobalSection
 EndGlobal
