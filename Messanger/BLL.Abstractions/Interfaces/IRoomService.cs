@@ -13,10 +13,10 @@ namespace BLL.Abstractions.Interfaces
         public Task<IEnumerable<Room>> GetRooms();
         public Task<Room> GetRoom(Func<Room, bool> func);
         public Task<bool> RoomExists(string name);
-        bool CreateRole(string roleName, Room room);
+        // bool CreateRole(string roleName, Room room);
         // Task<Room> GetRoom(string roomName);
-        bool DeleteRole(string roleName, Room room);
-        IEnumerable<Role> GetAllRoles(Room room);
+        // bool DeleteRole(string roleName, Room room);
+        // IEnumerable<Role> GetAllRoles(Room room);
 
 
     }

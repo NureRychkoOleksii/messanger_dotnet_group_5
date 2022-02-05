@@ -21,12 +21,7 @@ namespace BLL.Services
 
         public async void CreateUser(User user)
         {
-            var condition = await CheckRegisterData(user.Nickname, user.Password, user.Email);
-            
-            if (condition)
-            {
-                await _repository.CreateObjectAsync(user);
-            }
+            await _repository.CreateObjectAsync(user);
         }
 
         public async void DeleteUser(User user)
@@ -76,7 +71,8 @@ namespace BLL.Services
             return user.Where(func).FirstOrDefault() != null;
         }
         
-        private async Task<bool> CheckRegisterData (string nickname, string password, string email)
+        public async Task<string> CheckRegisterData (string nickname, string password, string confirmPassword, 
+            string email)
         {
             var users = await this.GetUsers();
             var userName = users.Where(user => user.Nickname == nickname).FirstOrDefault();
@@ -84,22 +80,23 @@ namespace BLL.Services
             string checkEmail = new string( @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
             if (userName != null || String.IsNullOrEmpty(nickname))
             {
-                Console.WriteLine("The given nickname is not unique.\n");
-                return false;
+                return Status.UserNameNotUnique;
             }
             else if (!Regex.IsMatch(email, checkEmail))
             {
-                Console.WriteLine("Invalid email.\n");
-                return false;
+                return Status.InvalidEmail;
             }
             else if (!Regex.IsMatch(password, checkPassword))
             {
-                Console.WriteLine("Invalid password.\n");
-                return false;
+                return Status.InvalidPassword;
+            }
+            else if (!password.Equals(confirmPassword))
+            {
+                return Status.PasswordsNotMatch;
             }
             else
             {
-                return true;
+                return Status.StatusOk;
             }
         }
     }

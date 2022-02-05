@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using BLL.Abstractions;
 using Core;
 using Core.Models;
 using BLL.Abstractions.Interfaces;
 
 namespace BLL
 {
-    public class Session
+    public class Session : ISession
     {
         private readonly IUserService _userService;
         private readonly IRoomService _roomService;
@@ -91,18 +92,18 @@ namespace BLL
             }
         }
 
-        public bool EnterChat(Chat chatToEnter)
+        public async Task<bool> EnterChat(Chat chatToEnter)
         {
             if (chatToEnter == null)
             {
                 return false;
             }
 
-            var chats = _chatService.GetChats(_currentRoom)
-                .Where(chat => chat.Name == chatToEnter.Name)
+            var chats = await _chatService.GetChats(_currentRoom);
+            var chat = chats.Where(chat => chat.Name == chatToEnter.Name)
                 .FirstOrDefault();
 
-            if (chats != null)
+            if (chat != null)
             {
                 _currentChat = chatToEnter;
                 return true;

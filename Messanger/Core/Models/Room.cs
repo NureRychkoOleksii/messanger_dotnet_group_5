@@ -8,20 +8,18 @@ namespace Core
     {
         public string RoomName { get; set; }
 
-        public Dictionary<int, Role> Roles = new Dictionary<int, Role>()
+        private Role Admin = new Role()
         {
-            [0] = new Role()
-            {
-                RoleName = "Admin", Permissions = new Dictionary<string, bool>()
-                {
-                    ["Manage roles"] = true,
-                    ["Rename room"] = true
-                }
-            },
-            [1] = new Role() {RoleName = "User"}
+            RoleName = "Admin",
+            ManageRoles = true, RenameRoom = true, Id = 0
         };
 
-        public List<Chat> Chats = new List<Chat>();
+        private Role User = new Role()
+        {
+            RoleName = "User", Id = 1
+        };
+
+        public List<Chat> Chats = new List<Chat>() {};
 
         // public List<Role> Roles { get; set; }
         //

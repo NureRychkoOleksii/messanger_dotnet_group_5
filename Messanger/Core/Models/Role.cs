@@ -5,14 +5,12 @@ using Newtonsoft.Json.Serialization;
 
 namespace Core
 {
-    public class Role
+    public class Role : IdKey
     {
         public string RoleName;
 
-        public Dictionary<string, bool> Permissions = new Dictionary<string, bool>()
-        {
-            ["Manage roles"] = false,
-            ["Rename room"] = false
-        };
+        public bool ManageRoles = false;
+
+        public bool RenameRoom = false;
     }
 }

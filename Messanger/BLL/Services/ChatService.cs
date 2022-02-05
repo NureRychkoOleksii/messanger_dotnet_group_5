@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using BLL.Abstractions.Interfaces;
 using Core;
 using Core.Models;
@@ -18,20 +20,11 @@ namespace BLL.Services
             _roomService = roomService;
         }
         
-        public bool CreateChat(Chat chat, Room room)
+        public async void CreateChat(Chat chat, Room room)
         {
-            if (!this.ChatExists(chat, room))
-            {
-                _repository.CreateObjectAsync(chat);
-                
-                room.Chats.Add(chat);
-                _roomService.UpdateRoom(room);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            await Task.Run(() => _repository.CreateObjectAsync(chat));
+            room.Chats.Add(chat);
+            _roomService.UpdateRoom(room);
         }
 
         public void DeleteChat(Chat chat)
@@ -44,16 +37,16 @@ namespace BLL.Services
             _repository.UpdateObjectAsync(chat);
         }
 
-        public IEnumerable<Chat> GetChats(Room room)
+        public async Task<IEnumerable<Chat>> GetChats(Room room)
         {
-            var chats = _repository.GetAllAsync(typeof(Chat)).Result
-                .Where(chat => chat.RoomId == room.Id);
-            return chats;
+            var chats = await _repository.GetAllAsync(typeof(Chat));
+            var roomChats = chats.Where(chat => chat.RoomId == room.Id);
+            return roomChats;
         }
 
-        public bool ChatExists(Chat chat, Room room)
+        public async Task<bool> ChatExists(Chat chat, Room room)
         {
-            var roomChats = this.GetChats(room);
+            var roomChats = await this.GetChats(room);
 
             var searchedChat = roomChats.Where(roomChat => roomChat.Name == chat.Name).FirstOrDefault();
 
@@ -65,12 +58,12 @@ namespace BLL.Services
             return false;
         }
 
-        public Chat GetChat(string chatName, Room room)
+        public async Task<Chat> GetChat(string chatName, Room room)
         {
-            var chats = this.GetChats(room)
-                .Where(chat => chat.Name == chatName)
+            var chats = await this.GetChats(room);
+            var chat = chats.Where(chat => chat.Name == chatName)
                 .FirstOrDefault();
-            return chats;
+            return chat;
         }
     }
 }

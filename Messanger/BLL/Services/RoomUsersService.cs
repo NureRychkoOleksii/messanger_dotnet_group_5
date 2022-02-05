@@ -73,36 +73,36 @@ namespace BLL.Services
         //     return role.RoleName;
         // }
 
-        public async Task<Role> GetUserRole(User user, Room room)
-        {
-            var roomUserAsync = await _repository
-                .GetAllAsync(typeof(RoomUsers));
-            var roomUser = roomUserAsync.Where(roomUser => roomUser.UserId == user.Id && roomUser.RoomId == room.Id)
-                .FirstOrDefault();
-            
-            var userRole = room.Roles
-                .Where(role => role.Key == roomUser.UserRole)
-                .FirstOrDefault().Value;
-
-            return userRole;
-        }
-        
-        public Role GetUserRole(User user, Room room, out int roleId)
-        {
-            RoomUsers roomUser = _repository
-                .GetAllAsync(typeof(RoomUsers))
-                .Result.Where(roomUser => roomUser.UserId == user.Id
-                                          && roomUser.RoomId == room.Id)
-                .FirstOrDefault();
-            
-            Role userRole = room.Roles
-                .Where(role => role.Key == roomUser.UserRole)
-                .FirstOrDefault().Value;
-
-            roleId = roomUser.UserRole;
-            
-            return userRole;
-        }
+        // public async Task<Role> GetUserRole(User user, Room room)
+        // {
+        //     var roomUserAsync = await _repository
+        //         .GetAllAsync(typeof(RoomUsers));
+        //     var roomUser = roomUserAsync.Where(roomUser => roomUser.UserId == user.Id && roomUser.RoomId == room.Id)
+        //         .FirstOrDefault();
+        //     
+        //     var userRole = room.Roles
+        //         .Where(role => role.Key == roomUser.UserRole)
+        //         .FirstOrDefault().Value;
+        //
+        //     return userRole;
+        // }
+        //
+        // public Role GetUserRole(User user, Room room, out int roleId)
+        // {
+        //     RoomUsers roomUser = _repository
+        //         .GetAllAsync(typeof(RoomUsers))
+        //         .Result.Where(roomUser => roomUser.UserId == user.Id
+        //                                   && roomUser.RoomId == room.Id)
+        //         .FirstOrDefault();
+        //     
+        //     Role userRole = room.Roles
+        //         .Where(role => role.Key == roomUser.UserRole)
+        //         .FirstOrDefault().Value;
+        //
+        //     roleId = roomUser.UserRole;
+        //     
+        //     return userRole;
+        // }
         
 
         
@@ -116,7 +116,7 @@ namespace BLL.Services
 
             foreach(RoomUsers roomUser in roomUsers)
             {
-                var room = await _roomService.GetRoom(user => user.Id == roomUser.Id);
+                var room = await _roomService.GetRoom(room => room.Id == roomUser.RoomId);
                 rooms.Add(room);
             }
             
