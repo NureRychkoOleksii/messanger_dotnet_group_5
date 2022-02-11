@@ -35,7 +35,8 @@ namespace Messanger
 
             while (!action.Equals("exit"))
             {
-                await ResolveActionAsync(action);
+                var actionAsync = ResolveActionAsync(action);
+                actionAsync.Wait();
                 Console.Write("Choose one option: ");
                 action = Console.ReadLine();
             }
