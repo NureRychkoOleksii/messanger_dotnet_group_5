@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DAL.Abstractions", "DAL.Abs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PL.Abstractions", "PL.Abstractions\PL.Abstractions.csproj", "{08FE710C-93FE-4D70-AD3F-B4D4151E96E2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web_MSL", "Web_MSL\Web_MSL.csproj", "{264B3A23-FDCB-4926-AAB4-626BB2AE52D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{08FE710C-93FE-4D70-AD3F-B4D4151E96E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{08FE710C-93FE-4D70-AD3F-B4D4151E96E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{08FE710C-93FE-4D70-AD3F-B4D4151E96E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{264B3A23-FDCB-4926-AAB4-626BB2AE52D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{264B3A23-FDCB-4926-AAB4-626BB2AE52D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{264B3A23-FDCB-4926-AAB4-626BB2AE52D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{264B3A23-FDCB-4926-AAB4-626BB2AE52D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
