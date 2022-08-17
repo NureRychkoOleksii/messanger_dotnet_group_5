@@ -8,9 +8,9 @@ namespace BLL.Abstractions.Interfaces
 {
     public interface IUserService
     {
-        void CreateUser(User user);
-        void DeleteUser(User user);
-        void UpdateUser(User user);
+        Task CreateUser(User user);
+        Task DeleteUser(User user);
+        Task UpdateUser(User user);
 
         public Task<IEnumerable<User>> GetUsers();
         // User GetUser(string username);

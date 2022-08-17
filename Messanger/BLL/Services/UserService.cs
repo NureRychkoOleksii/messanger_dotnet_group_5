@@ -23,7 +23,7 @@ namespace BLL.Services
             _genericRepository = repository;
         }
 
-        public async void CreateUser(User user)
+        public async Task CreateUser(User user)
         {
 
             _unitOfWork.CreateTransaction();
@@ -51,7 +51,7 @@ namespace BLL.Services
             
         }
 
-        public async void DeleteUser(User user)
+        public async Task DeleteUser(User user)
         {
             _unitOfWork.CreateTransaction();
             
@@ -77,7 +77,7 @@ namespace BLL.Services
             }
         }
 
-        public async void UpdateUser(User user)
+        public async Task UpdateUser(User user)
         {
             _unitOfWork.CreateTransaction();
             
